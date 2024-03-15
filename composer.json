@@ -1,0 +1,21 @@
+{
+    "name": "joaobarreto255/php-compiler-lib",
+    "description": "Helps create php compilers",
+    "type": "library",
+    "require-dev": {
+        "phpunit/phpunit": "^11.0"
+    },
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Joaobarreto255\\PhpCompBuilder\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "João Barreto"
+        }
+    ],
+    "minimum-stability": "stable",
+    "require": {}
+}
