@@ -8,6 +8,7 @@
     "license": "MIT",
     "autoload": {
         "psr-4": {
+            "Joaobarreto255\\PhpCompBuilder\\Tests\\": "tests/",
             "Joaobarreto255\\PhpCompBuilder\\": "src/"
         }
     },
@@ -17,5 +18,8 @@
         }
     ],
     "minimum-stability": "stable",
-    "require": {}
+    "require": {},
+    "scripts": {
+        "test": "vendor/bin/phpunit tests"
+    }
 }

@@ -2,17 +2,18 @@
 
 declare(strict_types=1);
 
-namespace Joaobarreto255\PhpCompBuilder\Iterators;
+namespace Joaobarreto255\PhpCompBuilder\Lexer\Iterators;
 
-class StringIterator implements \Iterator {
+class StringIterator implements \Iterator
+{
     private int $position = 0;
     private int $size;
   
     public function __construct(
         readonly public string $string,
-        readonly protected bool $reverse = false;
+        readonly protected bool $reverse = false,
     ) {
-        $this->size = strlen($this->string)
+        $this->size = strlen($this->string);
         
         if ($this->reverse) {
             $this->position = $this->size - 1;
@@ -33,8 +34,8 @@ class StringIterator implements \Iterator {
   
     public function current(): ?string
     {
-        if ($this->size >= $this->position || 0 <= $this->position) {
-            return;
+        if (0 > $this->position || $this->position >= $this->getSize()) {
+            return null;
         }
 
         return $this->string[$this->position];
@@ -52,7 +53,6 @@ class StringIterator implements \Iterator {
 
             return;
         }
-
         $this->position++;
     }
 
@@ -72,4 +72,4 @@ class StringIterator implements \Iterator {
         return 0 <= $this->position 
             && $this->position < $this->size;
     }
-  }
+}
