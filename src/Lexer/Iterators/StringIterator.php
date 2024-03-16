@@ -72,4 +72,13 @@ class StringIterator implements \Iterator
         return 0 <= $this->position
             && $this->position < $this->size;
     }
+
+    public function currentCode(): ?int
+    {
+        if (null !== ($curr = $this->current())) {
+            return ord($curr);
+        }
+
+        return null;
+    }
 }

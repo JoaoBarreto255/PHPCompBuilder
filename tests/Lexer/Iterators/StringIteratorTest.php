@@ -123,6 +123,22 @@ class StringIteratorTest extends TestCase
         }
     }
 
+    #[DataProvider('generalDataProvider')]
+    #[TestDox('Testa iteração do for loop')]
+    public function testCurrentInsideLoop(StringIterator $it, array $expectedValues, array $expectedKeys, array $expectedValid)
+    {
+        foreach ($it as $key => $value) {
+            $expectedKey = current($expectedKeys);
+            $this->assertSame($expectedKey, $key);
+            next($expectedKeys);
+
+            $expectedValue = current($expectedValues);
+            $this->assertSame($expectedValue, $value);
+            $this->assertSame($expectedValue, $it->current());
+            next($expectedValues);
+        }
+    }
+
     public static function generalDataProvider(): array
     {
         return [
