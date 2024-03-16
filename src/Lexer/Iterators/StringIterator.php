@@ -58,13 +58,13 @@ class StringIterator implements \Iterator
 
     public function previous(): void
     {
-        if (0 !== $this->position && !$this->reverse) {
-            $this->position++;
+        if (!$this->reverse) {
+            $this->position--;
+
+            return;
         }
 
-        if (1 - $this->size > $this->position && $this->reverse) {
-            $this->position--;
-        }
+        $this->position++;
     }
   
     public function valid(): bool
