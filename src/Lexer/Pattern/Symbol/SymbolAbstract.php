@@ -37,7 +37,7 @@ abstract class SymbolAbstract
                     'Property "end" must be false or greater or equals to "begin"! got: %d',
                     $this->end
                 )
-            ); 
+            );
         }
     }
 
@@ -48,8 +48,7 @@ abstract class SymbolAbstract
         bool $maybeExist = false,
         int $start = 1,
         int $end = 1,
-    ): static
-    {
+    ): static {
         if ($startRepeat) {
             return new self($symbol, 0, false);
         }

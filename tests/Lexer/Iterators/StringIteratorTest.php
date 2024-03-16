@@ -50,7 +50,7 @@ class StringIteratorTest extends TestCase
             $it->next();
         }
     }
-    
+
     #[DataProvider('generalDataProvider')]
     #[TestDox('Test methods valid and next together')]
     public function testNextAndValid(StringIterator $it, array $expectedValues, array $expectedKeys, array $expectedValid)
@@ -60,7 +60,7 @@ class StringIteratorTest extends TestCase
             $it->next();
         }
     }
-    
+
     #[DataProvider('generalDataProvider')]
     #[TestDox('Test methods Rewind and Next together')]
     public function testRewind(StringIterator $it, array $expectedValues, array $expectedKeys, array $expectedValid)
@@ -76,7 +76,7 @@ class StringIteratorTest extends TestCase
             $this->assertSame($expected, $it->current());
             $it->next();
         }
-    
+
         # test rewind and key.
         $it->rewind();
         foreach($expectedKeys as $expected) {
@@ -90,7 +90,7 @@ class StringIteratorTest extends TestCase
             $this->assertSame($expected, $it->valid());
             $it->next();
         }
-        
+
         # test all together.
         $zipped = array_map(null, $expectedValues, $expectedKeys, $expectedValid);
         $it->rewind();

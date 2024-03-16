@@ -8,13 +8,13 @@ class StringIterator implements \Iterator
 {
     private int $position = 0;
     private int $size;
-  
+
     public function __construct(
         readonly public string $string,
         readonly protected bool $reverse = false,
     ) {
         $this->size = strlen($this->string);
-        
+
         if ($this->reverse) {
             $this->position = $this->size - 1;
         }
@@ -24,14 +24,14 @@ class StringIterator implements \Iterator
     {
         return $this->size;
     }
-  
+
     public function rewind(): void
     {
         $this->position = !$this->reverse
             ? 0
             : $this->size - 1;
     }
-  
+
     public function current(): ?string
     {
         if (0 > $this->position || $this->position >= $this->getSize()) {
@@ -40,13 +40,13 @@ class StringIterator implements \Iterator
 
         return $this->string[$this->position];
     }
-  
+
     public function key(): int
     {
         return $this->position;
     }
-  
-    public function next(): void 
+
+    public function next(): void
     {
         if ($this->reverse) {
             $this->position--;
@@ -66,10 +66,10 @@ class StringIterator implements \Iterator
 
         $this->position++;
     }
-  
+
     public function valid(): bool
     {
-        return 0 <= $this->position 
+        return 0 <= $this->position
             && $this->position < $this->size;
     }
 }

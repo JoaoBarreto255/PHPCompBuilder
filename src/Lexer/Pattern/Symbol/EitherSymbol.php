@@ -14,8 +14,7 @@ class EitherSymbol extends SymbolAbstract
         bool $maybeExist = false,
         int $start = 1,
         int $end = 1,
-    ): static
-    {
+    ): static {
         if (0 === strlen($sequence)) {
             throw new \LogicException("GroupSequenceSymbol can't receive more than one", 1);
         }

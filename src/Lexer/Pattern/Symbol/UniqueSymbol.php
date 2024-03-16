@@ -13,8 +13,7 @@ class UniqueSymbol extends SymbolAbstract
         bool $maybeExist = false,
         int $start = 1,
         int $end = 1,
-    ): static
-    {
+    ): static {
         if (1 !== strlen($symbol)) {
             throw new \LogicException("UniqueSymbol can't receive more than one", 1);
         }
