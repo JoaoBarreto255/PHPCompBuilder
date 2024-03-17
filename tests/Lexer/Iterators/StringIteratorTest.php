@@ -10,6 +10,11 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\TestDox;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * @internal
+ *
+ * @coversNothing
+ */
 #[CoversClass(StringIterator::class)]
 class StringIteratorTest extends TestCase
 {
@@ -24,8 +29,8 @@ class StringIteratorTest extends TestCase
     public static function getSizeDataProvider(): array
     {
         $result = [];
-        for ($i = 1; $i < 26; $i++) {
-            $result["data set $i"] = [$i, random_bytes($i)];
+        for ($i = 1; $i < 26; ++$i) {
+            $result["data set {$i}"] = [$i, random_bytes($i)];
         }
 
         return $result;
@@ -35,7 +40,7 @@ class StringIteratorTest extends TestCase
     #[TestDox('Test methods current and next together')]
     public function testNextAndCurrent(StringIterator $it, array $expectedValues, array $expectedKeys, array $expectedValid)
     {
-        foreach($expectedValues as $expected) {
+        foreach ($expectedValues as $expected) {
             $this->assertSame($expected, $it->current());
             $it->next();
         }
@@ -45,7 +50,7 @@ class StringIteratorTest extends TestCase
     #[TestDox('Test methods key and next together')]
     public function testNextAndKey(StringIterator $it, array $expectedValues, array $expectedKeys, array $expectedValid)
     {
-        foreach($expectedKeys as $expected) {
+        foreach ($expectedKeys as $expected) {
             $this->assertSame($expected, $it->key());
             $it->next();
         }
@@ -65,36 +70,36 @@ class StringIteratorTest extends TestCase
     #[TestDox('Test methods Rewind and Next together')]
     public function testRewind(StringIterator $it, array $expectedValues, array $expectedKeys, array $expectedValid)
     {
-        foreach($expectedValues as $expected) {
+        foreach ($expectedValues as $expected) {
             $this->assertSame($expected, $it->current());
             $it->next();
         }
 
-        # test rewind and current.
+        // test rewind and current.
         $it->rewind();
-        foreach($expectedValues as $expected) {
+        foreach ($expectedValues as $expected) {
             $this->assertSame($expected, $it->current());
             $it->next();
         }
 
-        # test rewind and key.
+        // test rewind and key.
         $it->rewind();
-        foreach($expectedKeys as $expected) {
+        foreach ($expectedKeys as $expected) {
             $this->assertSame($expected, $it->key());
             $it->next();
         }
 
-        # test valid and rewind.
+        // test valid and rewind.
         $it->rewind();
         foreach ($expectedValid as $expected) {
             $this->assertSame($expected, $it->valid());
             $it->next();
         }
 
-        # test all together.
+        // test all together.
         $zipped = array_map(null, $expectedValues, $expectedKeys, $expectedValid);
         $it->rewind();
-        foreach($zipped as [$value, $key, $isValid]) {
+        foreach ($zipped as [$value, $key, $isValid]) {
             $this->assertSame($value, $it->current());
             $this->assertSame($key, $it->key());
             $this->assertSame($isValid, $it->valid());
@@ -107,15 +112,15 @@ class StringIteratorTest extends TestCase
     public function testPrevious(StringIterator $it, array $expectedValues, array $expectedKeys, array $expectedValid)
     {
         $zipped = array_map(null, $expectedValues, $expectedKeys, $expectedValid);
-        foreach($zipped as [$value, $key, $isValid]) {
+        foreach ($zipped as [$value, $key, $isValid]) {
             $this->assertSame($value, $it->current());
             $this->assertSame($key, $it->key());
             $this->assertSame($isValid, $it->valid());
             $it->next();
         }
 
-        # test previous.
-        foreach(array_reverse($zipped) as [$value, $key, $isValid]) {
+        // test previous.
+        foreach (array_reverse($zipped) as [$value, $key, $isValid]) {
             $it->previous();
             $this->assertSame($value, $it->current());
             $this->assertSame($key, $it->key());
@@ -142,19 +147,18 @@ class StringIteratorTest extends TestCase
     public static function generalDataProvider(): array
     {
         return [
-            "data set #1 - abc" => [
+            'data set #1 - abc' => [
                 new StringIterator('abc'),
-                ["a", "b", "c", null],
+                ['a', 'b', 'c', null],
                 [0, 1, 2, 3],
                 [true, true, true, false],
             ],
-            "data set #2 - reverse abc" => [
+            'data set #2 - reverse abc' => [
                 new StringIterator('abc', true),
-                ["c", "b", "a", null],
+                ['c', 'b', 'a', null],
                 [2, 1, 0, -1],
                 [true, true, true, false],
             ],
         ];
     }
-
 }
