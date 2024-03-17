@@ -4,13 +4,11 @@ declare(strict_types=1);
 
 namespace Joaobarreto255\PhpCompBuilder\Lexer\Pattern\Symbol;
 
-use Joaobarreto255\PhpCompBuilder\Lexer\Pattern\Symbol\SymbolAbstract;
-
 class ClassSymbol extends SymbolAbstract
 {
-    const CODE_BAR = 92;
-    const CODE_NEG_SET = 94;
-    const CODE_MINUS = 45;
+    public const CODE_BAR = 92;
+    public const CODE_NEG_SET = 94;
+    public const CODE_MINUS = 45;
 
     public static function newFrom(
         string $symbol,
@@ -19,16 +17,15 @@ class ClassSymbol extends SymbolAbstract
         bool $maybeExist = false,
         int $start = 1,
         int $end = 1,
-    ): self
-    {
+    ): self {
         $cleanedSet = trim($symbol, '[]');
         if (empty($cleanedSet)) {
-            throw new \LogicException("ClassSymbol cannot be empty", 503);
+            throw new \LogicException('ClassSymbol cannot be empty', 503);
         }
 
         if ('.' === $cleanedSet) {
             $chars = static::makeIntervalCharSet();
-            foreach($chars as $key => $code) {
+            foreach ($chars as $key => $code) {
                 $chars[$key] = chr($code);
             }
 
@@ -40,7 +37,7 @@ class ClassSymbol extends SymbolAbstract
         $stack = [];
         $reverseSet = false;
         $append = false;
-        foreach($cleanedSet as $key => $char) {
+        foreach ($cleanedSet as $key => $char) {
             $charCode = ord($char);
             if (0 === $key && static::CODE_NEG_SET === $charCode) {
                 $reverseSet = true;
@@ -60,7 +57,7 @@ class ClassSymbol extends SymbolAbstract
 
             if (static::CODE_MINUS === $charCode) {
                 if (0 > ($last = strlen($stack) - 1)) {
-                    throw new \LogicException("Could not process pattern that starts with \"-\": '$set'", 503);
+                    throw new \LogicException("Could not process pattern that starts with \"-\": '{$set}'", 503);
                 }
 
                 $aux = $stack[$last];
@@ -73,7 +70,7 @@ class ClassSymbol extends SymbolAbstract
         }
 
         $result = static::processClass($stack, $reverseSet);
-        foreach($result as $key => $code) {
+        foreach ($result as $key => $code) {
             $result[$key] = chr($code);
         }
 
@@ -85,7 +82,7 @@ class ClassSymbol extends SymbolAbstract
     public static function makeIntervalCharSet(int $max = 255, int $min = 0): array
     {
         $stack = [];
-        for ($i = $min; $i <= $max; $i++) {
+        for ($i = $min; $i <= $max; ++$i) {
             $stack[] = $i;
         }
 
@@ -96,7 +93,7 @@ class ClassSymbol extends SymbolAbstract
     {
         $size = count($originalSet);
         $stack = [];
-        for ($k = 0; $k < $size; $k++) {
+        for ($k = 0; $k < $size; ++$k) {
             $curr = $originalSet[$k];
             if (true !== $curr) {
                 $stack[] = $curr;
@@ -104,18 +101,18 @@ class ClassSymbol extends SymbolAbstract
             }
 
             if ($k + 2 === $size) {
-                throw new \LogicException("Missing continuation in set. Ex.: [A-]");
+                throw new \LogicException('Missing continuation in set. Ex.: [A-]');
             }
 
             if (true === $originalSet[$k + 2]) {
-                throw new \LogicException("Ranges must no be sequenced. Ex.:\n wrong: [A-C-E].\n correct: [A-CE-G]");  
+                throw new \LogicException("Ranges must no be sequenced. Ex.:\n wrong: [A-C-E].\n correct: [A-CE-G]");
             }
 
             $start = $originalSet[$k + 1];
             $end = $originalSet[$k + 2];
 
             if ($start >= $end) {
-                throw new \LogicException("Range must be from lowest char code to greater. got (start: $start, end: $end)");
+                throw new \LogicException("Range must be from lowest char code to greater. got (start: {$start}, end: {$end})");
             }
 
             $stack = array_merge($stack, static::makeIntervalCharSet(

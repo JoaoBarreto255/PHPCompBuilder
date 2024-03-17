@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Joaobarreto255\PhpCompBuilder\Lexer\Pattern\Symbol;
 
-use Joaobarreto255\PhpCompBuilder\Lexer\Iterators\StringIterator;
-
 abstract class SymbolAbstract
 {
     // const TYPE_SYMBOL = 1;
@@ -22,7 +20,7 @@ abstract class SymbolAbstract
     protected function __construct(
         readonly public array|string $value,
         readonly public int $begin = 1,
-        readonly public int|false $end = 1,
+        readonly public false|int $end = 1,
     ) {
         if (empty($this->value)) {
             throw new \InvalidArgumentException('Property "value" must be not empty');
@@ -32,17 +30,12 @@ abstract class SymbolAbstract
         }
 
         if (false !== $this->end && $this->begin >= $this->end) {
-            throw new \InvalidArgumentException(
-                sprintf(
-                    'Property "end" must be false or greater or equals to "begin"! got: %d',
-                    $this->end
-                )
-            );
+            throw new \InvalidArgumentException(sprintf('Property "end" must be false or greater or equals to "begin"! got: %d', $this->end));
         }
     }
 
     public static function createSymbol(
-        string|array $symbol,
+        array|string $symbol,
         bool $starRepeat = false,
         bool $plusRepeat = false,
         bool $maybeExist = false,

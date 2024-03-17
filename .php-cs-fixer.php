@@ -8,6 +8,14 @@ $finder = (new PhpCsFixer\Finder())
 return (new PhpCsFixer\Config())
     ->setRules([
         '@PSR12' => true,
-        // 'strict_param' => true,
+        '@PhpCsFixer' => true,
+        '@Symfony' => true,
         'array_syntax' => ['syntax' => 'short'],
+        // // 'strict_param' => true,
+        // 'max_line_length' => [
+        //     'max' => 79,
+        //     'ignore_comments' => true,
+        // ],
+        'no_trailing_whitespace' => true,
+        'phpdoc_align' => true,
     ])->setFinder($finder);

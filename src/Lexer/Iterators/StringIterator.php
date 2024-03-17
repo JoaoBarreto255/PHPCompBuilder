@@ -49,22 +49,22 @@ class StringIterator implements \Iterator
     public function next(): void
     {
         if ($this->reverse) {
-            $this->position--;
+            --$this->position;
 
             return;
         }
-        $this->position++;
+        ++$this->position;
     }
 
     public function previous(): void
     {
         if (!$this->reverse) {
-            $this->position--;
+            --$this->position;
 
             return;
         }
 
-        $this->position++;
+        ++$this->position;
     }
 
     public function valid(): bool
