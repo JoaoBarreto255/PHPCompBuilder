@@ -4,11 +4,13 @@ declare(strict_types=1);
 
 namespace Joaobarreto255\PhpCompBuilder\Lexer\Pattern\Symbol;
 
+use Joaobarreto255\PhpCompBuilder\Lexer\Pattern\Symbol\SymbolAbstract;
+
 class ClassSymbol extends SymbolAbstract
 {
-    const CODE_BAR = ord('\\');
-    const CODE_NEG_SET = ord('^');
-    const CODE_MINUS = ord('-');
+    const CODE_BAR = 92;
+    const CODE_NEG_SET = 94;
+    const CODE_MINUS = 45;
 
     public static function newFrom(
         string $symbol,
@@ -17,7 +19,7 @@ class ClassSymbol extends SymbolAbstract
         bool $maybeExist = false,
         int $start = 1,
         int $end = 1,
-    ): static
+    ): self
     {
         $cleanedSet = trim($symbol, '[]');
         if (empty($cleanedSet)) {
@@ -32,7 +34,7 @@ class ClassSymbol extends SymbolAbstract
 
             $result = implode('', $chars);
 
-            return parent::createSymbol($result, $starRepeat, $plusRepeat, $maybeExist, $start, $end);
+            return static::createSymbol($result, $starRepeat, $plusRepeat, $maybeExist, $start, $end);
         }
 
         $stack = [];
@@ -77,12 +79,12 @@ class ClassSymbol extends SymbolAbstract
 
         $result = implode('', $result);
 
-        return parent::createSymbol($result, $starRepeat, $plusRepeat, $maybeExist, $start, $end);
+        return static::createSymbol($result, $starRepeat, $plusRepeat, $maybeExist, $start, $end);
     }
 
     public static function makeIntervalCharSet(int $max = 255, int $min = 0): array
     {
-        $stack = []
+        $stack = [];
         for ($i = $min; $i <= $max; $i++) {
             $stack[] = $i;
         }
@@ -110,7 +112,7 @@ class ClassSymbol extends SymbolAbstract
             }
 
             $start = $originalSet[$k + 1];
-            $end = $originalSet[$k + 2]
+            $end = $originalSet[$k + 2];
 
             if ($start >= $end) {
                 throw new \LogicException("Range must be from lowest char code to greater. got (start: $start, end: $end)");
