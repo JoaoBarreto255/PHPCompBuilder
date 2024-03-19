@@ -109,4 +109,52 @@ class SymbolTraitTest extends TestCase
         $this->assertSame(0, $new->start);
         $this->assertSame(1, $new->end);
     }
+
+    #[DataProvider('symbolWillRepeatNTimesDataProvider')]
+    #[TestDox('test method symbolWillRepeatNTimes for one or more repeatitions "{$n}"')]
+    public function testSymbolWillRepeatNTimes(int $n)
+    {
+        $original = MockedSymbol::createSymbol('foo');
+        $this->assertSame('foo', $original->value);
+        $this->assertSame(1, $original->start);
+        $this->assertSame(1, $original->end);
+
+        $new = $original->symbolWillRepeatNTimes($n);
+        $this->assertNotSame($original, $new);
+        $this->assertSame('foo', $new->value);
+        $this->assertSame($n, $new->start);
+        $this->assertSame($n, $new->end);
+    }
+
+    public static function symbolWillRepeatNTimesDataProvider(): array
+    {
+        return array_map(fn(int $i) => [$i], range(0,10));
+    }
+
+    #[DataProvider('symbolWillRepeatFromNToMTimesDataProvider')]
+    #[TestDox('test method symbolWillRepeatFromNToMTimes for n to m repeatitions "Range{$n,$m}"')]
+    public function testSymbolWillRepeatFromNToMTimes(int $n, int $m)
+    {
+        $original = MockedSymbol::createSymbol('foo');
+        $this->assertSame('foo', $original->value);
+        $this->assertSame(1, $original->start);
+        $this->assertSame(1, $original->end);
+
+        $new = $original->symbolWillRepeatFromNToMTimes($n, $m);
+        $this->assertNotSame($original, $new);
+        $this->assertSame('foo', $new->value);
+        $this->assertSame($n, $new->start);
+        $this->assertSame($m, $new->end);
+    }
+
+    public static function symbolWillRepeatFromNToMTimesDataProvider(): array
+    {
+        $result = [];
+        for ($i = 0; $i < 11; $i++) {
+            for ($j = $i; $j < 11; $j++) {
+                $result["DataPoint($i,$j)"] = [$i, $j];
+            }
+        }
+        return $result;
+    }
 }
