@@ -6,6 +6,8 @@ namespace Joaobarreto255\PhpCompBuilder\Tests\Lexer\Pattern\Symbol;
 
 use Joaobarreto255\PhpCompBuilder\Lexer\Pattern\Symbol\ClassSymbol;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\TestDox;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -16,20 +18,7 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(ClassSymbol::class)]
 class ClassSymbolTest extends TestCase
 {
-    public function testMakeIntervalCharSet()
-    {
-        $result = ClassSymbol::makeIntervalCharSet(10);
-
-        $this->assertIsArray($result);
-        $this->assertNotEmpty($result);
-        $this->assertSame([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10], $result);
-
-        $result = ClassSymbol::makeIntervalCharSet(10, 5);
-        $this->assertIsArray($result);
-        $this->assertNotEmpty($result);
-        $this->assertSame([5, 6, 7, 8, 9, 10], $result);
-    }
-
+    #[TestDox('Test static method processClass from ClassSymbol')]
     public function testProcessClass()
     {
         $result = ClassSymbol::processClass([2,5,7]);
@@ -52,5 +41,36 @@ class ClassSymbolTest extends TestCase
         $this->assertIsArray($result);
         $this->assertCount(count($expectedReverse), $result);
         $this->assertSame($expectedReverse, $result);
+    }
+
+    #[DataProvider('newFromDataProvider')]
+    #[TestDox('Test ClassSymbol newFrom with ($classPattern) -> ($expected)"')]
+    public function testNewFrom(string $classPattern, string $expected)
+    {
+        $result = ClassSymbol::newFrom($classPattern);
+
+        $this->assertSame($expected, $result->value);
+    }
+
+    public static function newFromDataProvider(): array
+    {
+        return [
+            ['.', implode('', array_map('chr', range(0,255)))],
+            ['a-z', 'abcdefghijklmnopqrstuvwxyz'],
+            ['a-zA', 'abcdefghijklmnopqrstuvwxyzA'],
+            ['a-zA-E', 'abcdefghijklmnopqrstuvwxyzABCDE'],
+            ['0-9\[-\]\-', '0123456789[\]-'],
+            ['\.\^\[\]', '.^[]'],
+            ['^0-9', implode(
+                '',
+                array_map(
+                    'chr',
+                    array_merge(
+                        range(0, 47),
+                        range(58, 255),
+                    )
+                )
+            )]
+        ];
     }
 }
