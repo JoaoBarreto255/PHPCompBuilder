@@ -4,19 +4,8 @@ declare(strict_types=1);
 
 namespace Joaobarreto255\PhpCompBuilder\Lexer\Pattern\Symbol;
 
-abstract class SymbolAbstract
+trait SymbolTrait
 {
-    // const TYPE_SYMBOL = 1;
-    // const TYPE_SET = 2;
-    // const TYPE_GROUP = 4;
-
-    // const ARITY_WITHOUT = 8;
-    // const ARITY_START = 16;
-    // const ARITY_PLUS = 32;
-    // const ARITY_WINDOWS = 64;
-
-    // const SET_NO_VALID = 128;
-
     protected function __construct(
         readonly public array|string $value,
         readonly public int $begin = 1,

@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace Joaobarreto255\PhpCompBuilder\Lexer\Pattern\Symbol;
 
-class GroupSymbol extends SymbolAbstract
+class GroupSymbol
 {
+    use SymbolTrait;
+
     public static function newFrom(
         array $sequence,
         bool $starRepeat = false,

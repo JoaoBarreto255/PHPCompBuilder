@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace Joaobarreto255\PhpCompBuilder\Lexer\Pattern\Symbol;
 
-class ClassSymbol extends SymbolAbstract
+class ClassSymbol
 {
+    use SymbolTrait;
+
     public const CODE_BAR = 92;
     public const CODE_NEG_SET = 94;
     public const CODE_MINUS = 45;

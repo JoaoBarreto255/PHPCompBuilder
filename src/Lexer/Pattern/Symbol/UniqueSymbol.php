@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace Joaobarreto255\PhpCompBuilder\Lexer\Pattern\Symbol;
 
-class UniqueSymbol extends SymbolAbstract
+class UniqueSymbol
 {
+    use SymbolTrait;
+
     public static function newFrom(
         string $symbol,
         bool $starRepeat = false,

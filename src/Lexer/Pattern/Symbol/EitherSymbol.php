@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace Joaobarreto255\PhpCompBuilder\Lexer\Pattern\Symbol;
 
-class EitherSymbol extends SymbolAbstract
+class EitherSymbol
 {
+    use SymbolTrait;
+
     public static function newFrom(
         SymbolAbstract $right,
         SymbolAbstract $left,
