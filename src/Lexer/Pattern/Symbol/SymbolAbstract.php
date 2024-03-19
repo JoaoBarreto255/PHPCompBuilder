@@ -42,7 +42,7 @@ abstract class SymbolAbstract
         int $start = 1,
         int $end = 1,
     ): static {
-        if ($startRepeat) {
+        if ($starRepeat) {
             return new static($symbol, 0, false);
         }
 

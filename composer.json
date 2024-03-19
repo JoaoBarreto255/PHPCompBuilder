@@ -20,7 +20,7 @@
     ],
     "minimum-stability": "stable",
     "scripts": {
-        "test": "vendor/bin/phpunit tests",
+        "test": "vendor/bin/phpunit tests --display-warnings",
         "fix-style": "vendor/bin/php-cs-fixer fix"
     }
 }
