@@ -22,15 +22,15 @@ abstract class SymbolAbstract
         readonly public int $begin = 1,
         readonly public false|int $end = 1,
     ) {
-        if (empty($this->value)) {
+        if (empty($value)) {
             throw new \InvalidArgumentException('Property "value" must be not empty');
         }
-        if (0 > $this->begin) {
+        if (0 > $begin) {
             throw new \InvalidArgumentException('Property "begin" must be not negative!');
         }
 
-        if (false !== $this->end && $this->begin >= $this->end) {
-            throw new \InvalidArgumentException(sprintf('Property "end" must be false or greater or equals to "begin"! got: %d', $this->end));
+        if (false !== $end && $begin > $end) {
+            throw new \InvalidArgumentException(sprintf('Property "end" must be false or greater or equals to "begin"! got: %d', $end));
         }
     }
 
@@ -43,18 +43,18 @@ abstract class SymbolAbstract
         int $end = 1,
     ): static {
         if ($startRepeat) {
-            return new self($symbol, 0, false);
+            return new static($symbol, 0, false);
         }
 
         if ($plusRepeat) {
-            return new self($symbol, 1, false);
+            return new static($symbol, 1, false);
         }
 
         if ($maybeExist) {
-            return new self($symbol, 0, 1);
+            return new static($symbol, 0, 1);
         }
 
-        return new self($symbol, $start, $end);
+        return new static($symbol, $start, $end);
     }
 
     public function symbolMaybeExistOrRepeat(): static
