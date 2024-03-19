@@ -8,18 +8,23 @@ trait SymbolTrait
 {
     protected function __construct(
         readonly public array|string $value,
-        readonly public int $begin = 1,
+        readonly public int $start = 1,
         readonly public false|int $end = 1,
     ) {
         if (empty($value)) {
             throw new \InvalidArgumentException('Property "value" must be not empty');
         }
-        if (0 > $begin) {
-            throw new \InvalidArgumentException('Property "begin" must be not negative!');
+
+        if (0 > $start) {
+            throw new \InvalidArgumentException('Property "start" must be not negative!');
         }
 
-        if (false !== $end && $begin > $end) {
-            throw new \InvalidArgumentException(sprintf('Property "end" must be false or greater or equals to "begin"! got: %d', $end));
+        if (false !== $end && $start > $end) {
+            throw new \InvalidArgumentException(
+                sprintf(
+                    'Property "end" must be false or greater or equals to "start"! got: %d',
+                    $end
+                ));
         }
     }
 
@@ -29,7 +34,7 @@ trait SymbolTrait
         bool $plusRepeat = false,
         bool $maybeExist = false,
         int $start = 1,
-        int $end = 1,
+        int|false $end = 1,
     ): static {
         if ($starRepeat) {
             return new static($symbol, 0, false);
@@ -43,12 +48,16 @@ trait SymbolTrait
             return new static($symbol, 0, 1);
         }
 
+        if (false !== $end && $start > $end) {
+            return new static($symbol, $start, $start);
+        }
+
         return new static($symbol, $start, $end);
     }
 
     public function symbolMaybeExistOrRepeat(): static
     {
-        return static::createSymbol($this->value, true);
+        return static::createSymbol($this->value, starRepeat: true);
     }
 
     public function symbolMaybeRepeat(): static
