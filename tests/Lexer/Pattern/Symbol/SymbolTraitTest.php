@@ -64,4 +64,49 @@ class SymbolTraitTest extends TestCase
             [['a'], -1, 10, 'Property "start" must be not negative!'],
         ];
     }
+
+    #[TestDox('test method symbolMaybeExistOrRepeat for zero or more repeatitions (*)')]
+    public function testSymbolMaybeExistOrRepeat()
+    {
+        $original = MockedSymbol::createSymbol('foo');
+        $this->assertSame('foo', $original->value);
+        $this->assertSame(1, $original->start);
+        $this->assertSame(1, $original->end);
+
+        $new = $original->symbolMaybeExistOrRepeat();
+        $this->assertNotSame($original, $new);
+        $this->assertSame('foo', $new->value);
+        $this->assertSame(0, $new->start);
+        $this->assertFalse($new->end);
+    }
+
+    #[TestDox('test method symbolMaybeRepeat for one or more repeatitions (+)')]
+    public function testSymbolMaybeRepeat()
+    {
+        $original = MockedSymbol::createSymbol('foo');
+        $this->assertSame('foo', $original->value);
+        $this->assertSame(1, $original->start);
+        $this->assertSame(1, $original->end);
+
+        $new = $original->symbolMaybeRepeat();
+        $this->assertNotSame($original, $new);
+        $this->assertSame('foo', $new->value);
+        $this->assertSame(1, $new->start);
+        $this->assertFalse($new->end);
+    }
+
+    #[TestDox('test method symbolMayNotHappen for one or more repeatitions (+)')]
+    public function testSymbolMayNotHappen()
+    {
+        $original = MockedSymbol::createSymbol('foo');
+        $this->assertSame('foo', $original->value);
+        $this->assertSame(1, $original->start);
+        $this->assertSame(1, $original->end);
+
+        $new = $original->symbolMayNotHappen();
+        $this->assertNotSame($original, $new);
+        $this->assertSame('foo', $new->value);
+        $this->assertSame(0, $new->start);
+        $this->assertSame(1, $new->end);
+    }
 }
