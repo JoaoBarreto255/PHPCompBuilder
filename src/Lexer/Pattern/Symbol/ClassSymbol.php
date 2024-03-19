@@ -24,7 +24,7 @@ class ClassSymbol extends SymbolAbstract
         }
 
         if ('.' === $cleanedSet) {
-            $chars = static::makeIntervalCharSet();
+            $chars = range(0,255);
             foreach ($chars as $key => $code) {
                 $chars[$key] = chr($code);
             }
@@ -37,7 +37,7 @@ class ClassSymbol extends SymbolAbstract
         $stack = [];
         $reverseSet = false;
         $append = false;
-        foreach ($cleanedSet as $key => $char) {
+        foreach (str_split($cleanedSet) as $key => $char) {
             $charCode = ord($char);
             if (0 === $key && static::CODE_NEG_SET === $charCode) {
                 $reverseSet = true;
@@ -56,7 +56,7 @@ class ClassSymbol extends SymbolAbstract
             }
 
             if (static::CODE_MINUS === $charCode) {
-                if (0 > ($last = strlen($stack) - 1)) {
+                if (0 > ($last = count($stack) - 1)) {
                     throw new \LogicException("Could not process pattern that starts with \"-\": '{$set}'", 503);
                 }
 
@@ -77,16 +77,6 @@ class ClassSymbol extends SymbolAbstract
         $result = implode('', $result);
 
         return static::createSymbol($result, $starRepeat, $plusRepeat, $maybeExist, $start, $end);
-    }
-
-    public static function makeIntervalCharSet(int $max = 255, int $min = 0): array
-    {
-        $stack = [];
-        for ($i = $min; $i <= $max; ++$i) {
-            $stack[] = $i;
-        }
-
-        return $stack;
     }
 
     public static function processClass(array $originalSet, bool $reverse = false): array
@@ -115,15 +105,12 @@ class ClassSymbol extends SymbolAbstract
                 throw new \LogicException("Range must be from lowest char code to greater. got (start: {$start}, end: {$end})");
             }
 
-            $stack = array_merge($stack, static::makeIntervalCharSet(
-                $end,
-                $start,
-            ));
+            $stack = array_merge($stack, range($start, $end));
             $k += 2;
         }
 
         if ($reverse) {
-            return array_diff(static::makeIntervalCharSet(), $stack);
+            return array_diff(range(0, 255), $stack);
         }
 
         return $stack;
