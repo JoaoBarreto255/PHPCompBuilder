@@ -16,8 +16,8 @@ class UniqueSymbol
         int $start = 1,
         int $end = 1,
     ): static {
-        if (1 !== strlen($symbol)) {
-            throw new \LogicException("UniqueSymbol can't receive more than one", 1);
+        if (1 !== ($len = strlen($symbol))) {
+            throw new \InvalidArgumentException("Unique symbol must have length 1, found $len", 1);
         }
 
         return static::createSymbol($symbol, $starRepeat, $plusRepeat, $maybeExist, $start, $end);
