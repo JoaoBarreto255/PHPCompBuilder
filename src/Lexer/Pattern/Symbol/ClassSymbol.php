@@ -18,12 +18,11 @@ class ClassSymbol extends SymbolAbstract
         int $start = 1,
         int $end = 1,
     ): self {
-        $cleanedSet = trim($symbol, '[]');
-        if (empty($cleanedSet)) {
+        if (empty($symbol)) {
             throw new \LogicException('ClassSymbol cannot be empty', 503);
         }
 
-        if ('.' === $cleanedSet) {
+        if ('.' === $symbol) {
             $chars = range(0,255);
             foreach ($chars as $key => $code) {
                 $chars[$key] = chr($code);
@@ -37,7 +36,7 @@ class ClassSymbol extends SymbolAbstract
         $stack = [];
         $reverseSet = false;
         $append = false;
-        foreach (str_split($cleanedSet) as $key => $char) {
+        foreach (str_split($symbol) as $key => $char) {
             $charCode = ord($char);
             if (0 === $key && static::CODE_NEG_SET === $charCode) {
                 $reverseSet = true;
