@@ -144,6 +144,25 @@ class StringIteratorTest extends TestCase
         }
     }
 
+    #[TestDox('Testa metodo peek')]
+    public function testPeek()
+    {
+        $it = new StringIterator('abc');
+
+        $this->assertSame('b', $it->peek());
+        $it->next();
+        $this->assertSame('c', $it->peek());
+        $it->next();
+        $this->assertNull($it->peek());
+
+        $it = new StringIterator('abc', true);
+        $this->assertSame('b', $it->peek());
+        $it->next();
+        $this->assertSame('a', $it->peek());
+        $it->next();
+        $this->assertNull($it->peek());
+    }
+
     public static function generalDataProvider(): array
     {
         return [

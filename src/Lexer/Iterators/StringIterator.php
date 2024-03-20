@@ -34,7 +34,7 @@ class StringIterator implements \Iterator
 
     public function current(): ?string
     {
-        if (0 > $this->position || $this->position >= $this->getSize()) {
+        if (!$this->valid()) {
             return null;
         }
 
@@ -80,5 +80,15 @@ class StringIterator implements \Iterator
         }
 
         return null;
+    }
+
+    public function peek(): ?string
+    {
+        $this->next();
+
+        $peeked = $this->current();
+        $this->previous();
+
+        return $peeked;
     }
 }
