@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Joaobarreto255\PhpCompBuilder\Lexer\Pattern\Symbol;
 
-class GroupSymbol
+class GroupSymbol implements SymbolInterface
 {
     use SymbolTrait;
 
@@ -17,9 +17,18 @@ class GroupSymbol
         int $end = 1,
     ): static {
         if (0 === strlen($sequence)) {
-            throw new \LogicException("GroupSequenceSymbol can't receive more than one", 1);
+            throw new \InvalidArgumentException("Empty group symbol!", 1);
         }
 
         return static::createSymbol($symbol, $starRepeat, $plusRepeat, $maybeExist, $start, $end);
+    }
+
+    public function append(SymbolInterface $symbol): static
+    {
+        $sequence = $this->value;
+
+        $sequence[] = $symbol;
+
+        return new static($sequence, $this->start, $this->end);
     }
 }

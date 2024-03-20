@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Joaobarreto255\PhpCompBuilder\Lexer\Pattern\Symbol;
 
-class UniqueSymbol
+class UniqueSymbol implements SymbolInterface
 {
     use SymbolTrait;
 
