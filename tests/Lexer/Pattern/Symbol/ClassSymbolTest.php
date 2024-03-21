@@ -57,10 +57,10 @@ class ClassSymbolTest extends TestCase
         return [
             ['.', implode('', array_map('chr', range(0,255)))],
             ['a-z', 'abcdefghijklmnopqrstuvwxyz'],
-            ['a-zA', 'abcdefghijklmnopqrstuvwxyzA'],
-            ['a-zA-E', 'abcdefghijklmnopqrstuvwxyzABCDE'],
-            ['0-9\[-\]\-', '0123456789[\]-'],
-            ['\.\^\[\]', '.^[]'],
+            ['a-zA', 'Aabcdefghijklmnopqrstuvwxyz'],
+            ['a-zA-E', 'ABCDEabcdefghijklmnopqrstuvwxyz'],
+            ['0-9\[-\]\-', '-0123456789[\]'],
+            ['\.\^\[\]', '.[]^'],
             ['^0-9', implode(
                 '',
                 array_map(

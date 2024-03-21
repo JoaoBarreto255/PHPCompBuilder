@@ -79,4 +79,9 @@ trait SymbolTrait
     {
         return static::createSymbol($this->value, start: $n, end: $m);
     }
+
+    public function happenOneTime(): bool
+    {
+        return 1 === $this->start && 1 === $this->end;
+    }
 }

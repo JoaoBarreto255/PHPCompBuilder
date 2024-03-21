@@ -75,6 +75,9 @@ class ClassSymbol implements SymbolInterface
             $result[$key] = chr($code);
         }
 
+        $result = array_unique($result);
+        sort($result);
+        $result = array_values($result);
         $result = implode('', $result);
 
         return static::createSymbol($result, $starRepeat, $plusRepeat, $maybeExist, $start, $end);
