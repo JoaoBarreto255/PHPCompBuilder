@@ -16,11 +16,11 @@ class GroupSymbol implements SymbolInterface
         int $start = 1,
         int $end = 1,
     ): static {
-        if (0 === strlen($sequence)) {
+        if (0 === count($sequence)) {
             throw new \InvalidArgumentException("Empty group symbol!", 1);
         }
 
-        return static::createSymbol($symbol, $starRepeat, $plusRepeat, $maybeExist, $start, $end);
+        return static::createSymbol($sequence, $starRepeat, $plusRepeat, $maybeExist, $start, $end);
     }
 
     public function append(SymbolInterface $symbol): static
