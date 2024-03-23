@@ -5,11 +5,15 @@ declare(strict_types=1);
 namespace Joaobarreto255\PhpCompBuilder\Tests\Lexer\Pattern\Symbol;
 
 use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\TestDox;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\TestDox;
 use PHPUnit\Framework\TestCase;
 
-
+/**
+ * @internal
+ *
+ * @coversNothing
+ */
 #[CoversClass(SymbolAbstract::class)]
 class SymbolTraitTest extends TestCase
 {
@@ -25,19 +29,19 @@ class SymbolTraitTest extends TestCase
         $this->assertSame(0, $symbol->start);
         $this->assertFalse($symbol->end);
 
-        $symbol = MockedSymbol::createSymbol('foo', plusRepeat: true); 
+        $symbol = MockedSymbol::createSymbol('foo', plusRepeat: true);
         $this->assertSame(1, $symbol->start);
         $this->assertFalse($symbol->end);
 
-        $symbol = MockedSymbol::createSymbol('foo', maybeExist: true); 
+        $symbol = MockedSymbol::createSymbol('foo', maybeExist: true);
         $this->assertSame(0, $symbol->start);
         $this->assertSame(1, $symbol->end);
 
-        $symbol = MockedSymbol::createSymbol('foo', end: 10); 
+        $symbol = MockedSymbol::createSymbol('foo', end: 10);
         $this->assertSame(1, $symbol->start);
         $this->assertSame(10, $symbol->end);
 
-        $symbol = MockedSymbol::createSymbol('foo', start: 10); 
+        $symbol = MockedSymbol::createSymbol('foo', start: 10);
         $this->assertSame(10, $symbol->start);
         $this->assertSame(10, $symbol->end);
 
@@ -128,7 +132,7 @@ class SymbolTraitTest extends TestCase
 
     public static function symbolWillRepeatNTimesDataProvider(): array
     {
-        return array_map(fn(int $i) => [$i], range(0,10));
+        return array_map(fn (int $i) => [$i], range(0, 10));
     }
 
     #[DataProvider('symbolWillRepeatFromNToMTimesDataProvider')]
@@ -150,11 +154,12 @@ class SymbolTraitTest extends TestCase
     public static function symbolWillRepeatFromNToMTimesDataProvider(): array
     {
         $result = [];
-        for ($i = 0; $i < 11; $i++) {
-            for ($j = $i; $j < 11; $j++) {
-                $result["DataPoint($i,$j)"] = [$i, $j];
+        for ($i = 0; $i < 11; ++$i) {
+            for ($j = $i; $j < 11; ++$j) {
+                $result["DataPoint({$i},{$j})"] = [$i, $j];
             }
         }
+
         return $result;
     }
 }

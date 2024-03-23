@@ -17,7 +17,7 @@ class GroupSymbol implements SymbolInterface
         int $end = 1,
     ): static {
         if (0 === count($sequence)) {
-            throw new \InvalidArgumentException("Empty group symbol!", 1);
+            throw new \InvalidArgumentException('Empty group symbol!', 1);
         }
 
         return static::createSymbol($sequence, $starRepeat, $plusRepeat, $maybeExist, $start, $end);

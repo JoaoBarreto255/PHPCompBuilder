@@ -6,8 +6,8 @@ namespace Joaobarreto255\PhpCompBuilder\Tests\Lexer\Pattern\Symbol;
 
 use Joaobarreto255\PhpCompBuilder\Lexer\Pattern\Symbol\UniqueSymbol;
 use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\TestDox;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\TestDox;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -30,10 +30,10 @@ class UniqueSymbolTest extends TestCase
     public static function dataProvider(): array
     {
         return [
-            ['', "Unique symbol must have length 1, found 0"],
-            ['aa', "Unique symbol must have length 1, found 2"],
-            ['aaa', "Unique symbol must have length 1, found 3"],
-            ['aaaaaaaaaaa', "Unique symbol must have length 1, found 11"],
+            ['', 'Unique symbol must have length 1, found 0'],
+            ['aa', 'Unique symbol must have length 1, found 2'],
+            ['aaa', 'Unique symbol must have length 1, found 3'],
+            ['aaaaaaaaaaa', 'Unique symbol must have length 1, found 11'],
         ];
     }
 }

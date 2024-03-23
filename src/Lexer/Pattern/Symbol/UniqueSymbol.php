@@ -17,7 +17,7 @@ class UniqueSymbol implements SymbolInterface
         int $end = 1,
     ): static {
         if (1 !== ($len = strlen($symbol))) {
-            throw new \InvalidArgumentException("Unique symbol must have length 1, found $len", 1);
+            throw new \InvalidArgumentException("Unique symbol must have length 1, found {$len}", 1);
         }
 
         return static::createSymbol($symbol, $starRepeat, $plusRepeat, $maybeExist, $start, $end);

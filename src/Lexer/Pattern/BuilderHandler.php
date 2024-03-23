@@ -7,6 +7,8 @@ namespace Joaobarreto255\PhpCompBuilder\Lexer\Pattern;
 use LogicException;
 
 use Joaobarreto255\PhpCompBuilder\Lexer\Iterators\StringIterator;
+use Joaobarreto255\PhpCompBuilder\Lexer\Pattern\Exception\UnexpectedEndOfInputException;
+use Joaobarreto255\PhpCompBuilder\Lexer\Pattern\Exception\UnexpectedSymbolException;
 use Joaobarreto255\PhpCompBuilder\Lexer\Pattern\Symbol\ClassSymbol;
 use Joaobarreto255\PhpCompBuilder\Lexer\Pattern\Symbol\GroupSymbol;
 use Joaobarreto255\PhpCompBuilder\Lexer\Pattern\Symbol\UniqueSymbol;
@@ -37,53 +39,64 @@ class BuilderHandler
 
     private array $symbols = [];
 
+    private array $groupStacks = [];
+
     public function __construct(
         public readonly string $pattern
     ) {
-        $this->iterator = new StringIterator($this->pattern);
+        $this->iterator = new StringIterator($pattern);
     }
 
     public function processPattern()
     {
         while ($this->iterator->valid()) {
-            $key = $this->iterator->key();
-            $char = $this->iterator->current();
-            $code = $this->iterator->currentCode();
-
-            if (static::BAR === $code) {
-                $this->iterator->next();
-                $char = $this->iterator->current() ?? '';
-                $this->symbols[] = UniqueSymbol::newFrom($char);
-                $this->iterator->next()
-                continue;
-            }
-
-            if ($forceSymbol) {
-                $forceSymbol = false;
-                $this->symbols[] = UniqueSymbol::newFrom($char);
-                continue;
-            }
-
-            if ($funcName = static::REPEAT_MODS_MAP_CHECKS[$code] ?? false) {
-                if (!count($this->symbols)) {
-                    throw new LogicException("Unexpected \"$char\" repeat operation", $key);
-                }
-                $symbol = array_pop($this->symbols);
-                $this->symbols[] = $symbol->{$funcName}();
-                unset($symbol);
-        
-                continue;
-            }
+            $this->processAfterBarSymbol();
 
             $this->processClassPattern();
 
+            $this->processRepeatSymbol();
+
             $this->processBracePattern();
 
-            if ($this->processGroupPattern()) {
-                continue;
-            }
+            $this->processGroupPattern();
+
+            $this->processSingleSymbol();
         }
 
+        if ($this->groupStacks) {
+            $this->throwUnexpectedEndOfInputException(')');
+        }
+    }
+
+    public function processAfterBarSymbol(): void
+    {
+        if (static::CODE_BAR !== $this->iterator->currentCode()) {
+            return;
+        }
+
+        $this->iterator->next();
+        if (!$this->iterator->valid()) {
+            $this->throwUnexpectedEndOfInputException();
+        }
+
+        $this->processSingleSymbol();
+    }
+
+    public function processRepeatSymbol(): void
+    {
+        if (empty($funcName = static::REPEAT_MODS_MAP_CHECKS[$this->iterator->currentCode()] ?? false)) {
+            return;
+        }
+
+        $pos = $this->iterator->key();
+        $char = $this->iterator->current();
+        if (0 === count($this->symbols)) {
+            $this->throwUnexpectedSymbolException($char);
+        }
+
+        $symbol = array_pop($this->symbols);
+        $this->symbols[] = $symbol->{$funcName}();
+        $this->iterator->next();
     }
 
     public function processClassPattern(): void
@@ -94,7 +107,7 @@ class BuilderHandler
         }
 
         if (static::CODE_CLOSE_CLASS === ($code = $this->iterator->currentCode())) {
-            throw new LogicException("Unexpected \"]\" at pattern position: $key", $key);
+            $this->throwUnexpectedSymbolException(']');
         }
 
         if (static::CODE_OPEN_CLASS !== $code) { return null; }
@@ -113,6 +126,7 @@ class BuilderHandler
 
                 case static::CODE_CLOSE_CLASS:
                     $this->symbols[] = ClassSymbol::newFrom(substr($this->pattern, $startPos, $len));
+                    $this->iterator->next();
                     return;
                 
                 default:
@@ -124,7 +138,7 @@ class BuilderHandler
             $this->iterator->next();
         }
 
-        throw new LogicException("Unexpected end of pattern! Expecting \"]\"", 1);
+        $this->throwUnexpectedEndOfInputException(']');
     }
 
     public function processBracePattern(): void
@@ -133,7 +147,7 @@ class BuilderHandler
         $key = $this->iterator->key();
 
         if (static::CODE_CLOSE_BRACE === $code) { 
-            throw new LogicException(sprintf('Founded "]" with no previous "[" at position %d!', $key), $key);
+            $this->throwUnexpectedSymbolException(']');
         }
 
         if (static::CODE_OPEN_BRACE !== $code) {
@@ -185,20 +199,57 @@ class BuilderHandler
                 case '7':
                 case '8':
                 case '9':
-                    $numbers[count($num)] .= $this->iterator->current();
+                    $numbers[count($num) - 1] .= $this->iterator->current();
 
                 default:
-                    throw new LogicException("Invalid repeatition symbol: ". $this->iterator->current(), 1);
+                    throw new LogicException("Invalid repeatition symbol: ". $this->iterator->current(), $this->iterator->key());
             }
             $this->iterator->next();
         }
 
         
-        throw new LogicException('Unexpected end of pattern! Waiting for "}"', 1);
+        $this->throwUnexpectedEndOfInputException('}');
     }
 
-    public function processGroupPattern(): bool
+    public function processGroupPattern(): void
     {
+        if (static::CODE_CLOSE_GROUP === ($code = $this->iterator->currentCode())
+            && empty($this->groupStacks)
+        ) {
+            $pos = $this->iterator->key();
+            $this->throwUnexpectedSymbolException(')');
+        }
 
+        if (static::CODE_CLOSE_GROUP === $code) {
+            $symbol = GroupSymbol::newFrom($this->symbols);
+            $this->symbols = array_pop($this->groupStacks);
+            $this->symbols[] = $symbol;
+            $this->iterator->next();
+
+            return;
+        }
+
+        if (static::CODE_OPEN_GROUP !== $code) {
+            return;
+        }
+
+        $this->groupStacks[] = $this->symbols;
+        $this->iterator->next();
+    }
+
+    public function processSingleSymbol(): void
+    {
+        $this->symbols[] = UniqueSymbol::newFrom($this->iterator->current());
+        $this->iterator->next();
+    }
+
+    public function throwUnexpectedSymbolException(string $symbol): void
+    {
+        throw new UnexpectedSymbolException($this->pattern, $symbol, $this->iterator->key());
+    }
+
+    public function throwUnexpectedEndOfInputException(string $symbol = ''): void
+    {
+        throw new throwUnexpectedEndOfInputException($this->pattern, $symbol);
     }
 }

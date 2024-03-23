@@ -7,10 +7,15 @@ namespace Joaobarreto255\PhpCompBuilder\Tests\Lexer\Pattern\Symbol;
 use Joaobarreto255\PhpCompBuilder\Lexer\Pattern\Symbol\GroupSymbol;
 use Joaobarreto255\PhpCompBuilder\Lexer\Pattern\Symbol\UniqueSymbol;
 use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\TestDox;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\TestDox;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * @internal
+ *
+ * @coversNothing
+ */
 #[CoversClass(GroupSymbol::class)]
 class GroupSymbolTest extends TestCase
 {
@@ -26,7 +31,7 @@ class GroupSymbolTest extends TestCase
     public static function dataProvider(): array
     {
         return [
-            [[], "Empty group symbol!"],
+            [[], 'Empty group symbol!'],
         ];
     }
 

@@ -6,8 +6,8 @@ namespace Joaobarreto255\PhpCompBuilder\Tests\Lexer\Pattern\Symbol;
 
 use Joaobarreto255\PhpCompBuilder\Lexer\Pattern\Symbol\ClassSymbol;
 use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\TestDox;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\TestDox;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -21,17 +21,17 @@ class ClassSymbolTest extends TestCase
     #[TestDox('Test static method processClass from ClassSymbol')]
     public function testProcessClass()
     {
-        $result = ClassSymbol::processClass([2,5,7]);
+        $result = ClassSymbol::processClass([2, 5, 7]);
 
         $this->assertIsArray($result);
         $this->assertCount(3, $result);
-        $this->assertSame([2,5,7], $result);
+        $this->assertSame([2, 5, 7], $result);
 
-        $withRanges = [2,5,7, true, 97, 122, true, 65, 90, true, 48, 57];
+        $withRanges = [2, 5, 7, true, 97, 122, true, 65, 90, true, 48, 57];
 
         $result = ClassSymbol::processClass($withRanges);
 
-        $expected = array_merge([2,5,7], range(97, 122), range(65, 90), range(48, 57));
+        $expected = array_merge([2, 5, 7], range(97, 122), range(65, 90), range(48, 57));
         $this->assertIsArray($result);
         $this->assertCount(count($expected), $result);
         $this->assertSame($expected, $result);
@@ -55,7 +55,7 @@ class ClassSymbolTest extends TestCase
     public static function newFromDataProvider(): array
     {
         return [
-            ['.', implode('', array_map('chr', range(0,255)))],
+            ['.', implode('', array_map('chr', range(0, 255)))],
             ['a-z', 'abcdefghijklmnopqrstuvwxyz'],
             ['a-zA', 'Aabcdefghijklmnopqrstuvwxyz'],
             ['a-zA-E', 'ABCDEabcdefghijklmnopqrstuvwxyz'],
@@ -70,7 +70,7 @@ class ClassSymbolTest extends TestCase
                         range(58, 255),
                     )
                 )
-            )]
+            )],
         ];
     }
 }

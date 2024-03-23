@@ -25,7 +25,7 @@ class ClassSymbol implements SymbolInterface
         }
 
         if ('.' === $symbol) {
-            $chars = range(0,255);
+            $chars = range(0, 255);
             foreach ($chars as $key => $code) {
                 $chars[$key] = chr($code);
             }

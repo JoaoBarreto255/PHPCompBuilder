@@ -17,12 +17,12 @@ class EitherSymbol implements SymbolInterface
         int $start = 1,
         int $end = 1,
     ): SymbolInterface {
-        # if is not a sequence of symbols
+        // if is not a sequence of symbols
         if ($right instanceof GroupSymbol || $left instanceof GroupSymbol || $right instanceof static || $left instanceof static || !$right->happenOneTime() || !$left->happenOneTime()) {
             return static::createSymbol([$left, $right], $starRepeat, $plusRepeat, $maybeExist, $start, $end);
         }
 
-        return ClassSymbol::newFrom($left->value . $right->value, $starRepeat, $plusRepeat, $maybeExist, $start, $end);
+        return ClassSymbol::newFrom($left->value.$right->value, $starRepeat, $plusRepeat, $maybeExist, $start, $end);
     }
 
     public function getRightSymbol(): SymbolInterface

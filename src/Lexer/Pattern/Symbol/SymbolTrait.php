@@ -20,11 +20,7 @@ trait SymbolTrait
         }
 
         if (false !== $end && $start > $end) {
-            throw new \InvalidArgumentException(
-                sprintf(
-                    'Property "end" must be false or greater or equals to "start"! got: %d',
-                    $end
-                ));
+            throw new \InvalidArgumentException(sprintf('Property "end" must be false or greater or equals to "start"! got: %d', $end));
         }
     }
 
