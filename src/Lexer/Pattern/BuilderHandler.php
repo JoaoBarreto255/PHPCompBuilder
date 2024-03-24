@@ -27,7 +27,7 @@ class BuilderHandler
     const CODE_OPEN_BRACE = 123; // ASCII code for left curly brace ({)
     const CODE_CLOSE_BRACE = 125; // ASCII code for right curly brace (})
     const CODE_COMMA = 44;  // ASCII code for comma (,)
-    const CODE_DOT = 46
+    const CODE_DOT = 46; // ASCII code for (.)
 
     private const REPEAT_MODS_MAP_CHECKS = [
         42 => 'symbolMaybeExistOrRepeat', // ASCII code for asterisk (*) /action
@@ -110,7 +110,7 @@ class BuilderHandler
             $this->throwUnexpectedSymbolException(']');
         }
 
-        if (static::CODE_OPEN_CLASS !== $code) { return null; }
+        if (static::CODE_OPEN_CLASS !== $code) { return; }
 
         $startPos = $this->iterator->key() + 1;
         $this->iterator->next();
