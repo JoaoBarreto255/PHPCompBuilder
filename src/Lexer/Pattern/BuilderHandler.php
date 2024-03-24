@@ -4,30 +4,26 @@ declare(strict_types=1);
 
 namespace Joaobarreto255\PhpCompBuilder\Lexer\Pattern;
 
-use LogicException;
-
 use Joaobarreto255\PhpCompBuilder\Lexer\Iterators\StringIterator;
-use Joaobarreto255\PhpCompBuilder\Lexer\Pattern\Exception\UnexpectedEndOfInputException;
 use Joaobarreto255\PhpCompBuilder\Lexer\Pattern\Exception\UnexpectedSymbolException;
 use Joaobarreto255\PhpCompBuilder\Lexer\Pattern\Symbol\ClassSymbol;
 use Joaobarreto255\PhpCompBuilder\Lexer\Pattern\Symbol\GroupSymbol;
 use Joaobarreto255\PhpCompBuilder\Lexer\Pattern\Symbol\UniqueSymbol;
-use Joaobarreto255\PhpCompBuilder\Lexer\Pattern\Symbol\EitherSymbol;
 
 class BuilderHandler
 {
-    const CODE_BAR = 92;   // ASCII code for backslash (\)
-    const CODE_STAR = 42;   // ASCII code for asterisk (*)
-    const CODE_PLUS = 43;   // ASCII code for plus sign (+)
-    const CODE_MAYBE = 63;  // ASCII code for question mark (?)
-    const CODE_OPEN_CLASS = 91;  // ASCII code for left square bracket ([)
-    const CODE_CLOSE_CLASS = 93; // ASCII code for right square bracket (])
-    const CODE_OPEN_GROUP = 40; // ASCII code for left parenthesis (()
-    const CODE_CLOSE_GROUP = 41; // ASCII code for right parenthesis ())
-    const CODE_OPEN_BRACE = 123; // ASCII code for left curly brace ({)
-    const CODE_CLOSE_BRACE = 125; // ASCII code for right curly brace (})
-    const CODE_COMMA = 44;  // ASCII code for comma (,)
-    const CODE_DOT = 46; // ASCII code for (.)
+    public const CODE_BAR = 92;   // ASCII code for backslash (\)
+    public const CODE_STAR = 42;   // ASCII code for asterisk (*)
+    public const CODE_PLUS = 43;   // ASCII code for plus sign (+)
+    public const CODE_MAYBE = 63;  // ASCII code for question mark (?)
+    public const CODE_OPEN_CLASS = 91;  // ASCII code for left square bracket ([)
+    public const CODE_CLOSE_CLASS = 93; // ASCII code for right square bracket (])
+    public const CODE_OPEN_GROUP = 40; // ASCII code for left parenthesis (()
+    public const CODE_CLOSE_GROUP = 41; // ASCII code for right parenthesis ())
+    public const CODE_OPEN_BRACE = 123; // ASCII code for left curly brace ({)
+    public const CODE_CLOSE_BRACE = 125; // ASCII code for right curly brace (})
+    public const CODE_COMMA = 44;  // ASCII code for comma (,)
+    public const CODE_DOT = 46; // ASCII code for (.)
 
     private const REPEAT_MODS_MAP_CHECKS = [
         42 => 'symbolMaybeExistOrRepeat', // ASCII code for asterisk (*) /action
@@ -101,7 +97,7 @@ class BuilderHandler
 
     public function processClassPattern(): void
     {
-        if (static::CODE_DOT === $this->iterator->currentCode()) { 
+        if (static::CODE_DOT === $this->iterator->currentCode()) {
             $this->symbols[] = ClassSymbol::newFrom($this->iterator->current());
             $this->iterator->next();
         }
@@ -110,7 +106,9 @@ class BuilderHandler
             $this->throwUnexpectedSymbolException(']');
         }
 
-        if (static::CODE_OPEN_CLASS !== $code) { return; }
+        if (static::CODE_OPEN_CLASS !== $code) {
+            return;
+        }
 
         $startPos = $this->iterator->key() + 1;
         $this->iterator->next();
@@ -122,19 +120,19 @@ class BuilderHandler
                     $this->iterator->next();
                     break;
                 case static::CODE_OPEN_CLASS:
-                    throw new LogicException("Unexpected \"[\" at pattern position: $pos", $pos);
-
+                    throw new \LogicException("Unexpected \"[\" at pattern position: {$pos}", $pos);
                 case static::CODE_CLOSE_CLASS:
                     $this->symbols[] = ClassSymbol::newFrom(substr($this->pattern, $startPos, $len));
                     $this->iterator->next();
+
                     return;
-                
+
                 default:
-                    # do nothing
+                    // do nothing
                     break;
             }
 
-            $len++;
+            ++$len;
             $this->iterator->next();
         }
 
@@ -146,7 +144,7 @@ class BuilderHandler
         $code = $this->iterator->currentCode();
         $key = $this->iterator->key();
 
-        if (static::CODE_CLOSE_BRACE === $code) { 
+        if (static::CODE_CLOSE_BRACE === $code) {
             $this->throwUnexpectedSymbolException(']');
         }
 
@@ -161,15 +159,14 @@ class BuilderHandler
             $pos = $this->iterator->key();
             switch ($this->iterator->current()) {
                 case '{':
-                    throw new LogicException("Unexpected \"{\" at position $pos", $pos);
-                
+                    throw new \LogicException("Unexpected \"{\" at position {$pos}", $pos);
                 case '}':
                     if (0 === count($numbers)) {
-                        throw new LogicException("Empty set of repeatitions! position $pos", $pos);
+                        throw new \LogicException("Empty set of repeatitions! position {$pos}", $pos);
                     }
 
                     if (0 === count($this->symbols)) {
-                        throw new Exception("You cannot apply defined repeatition on no regex!", $startPos);
+                        throw new Exception('You cannot apply defined repeatition on no regex!', $startPos);
                     }
 
                     if (1 === count($numbers)) {
@@ -189,6 +186,7 @@ class BuilderHandler
                 case ',':
                     $numbers[] = '';
 
+                    // no break
                 case '0':
                 case '1':
                 case '2':
@@ -201,13 +199,13 @@ class BuilderHandler
                 case '9':
                     $numbers[count($num) - 1] .= $this->iterator->current();
 
+                    // no break
                 default:
-                    throw new LogicException("Invalid repeatition symbol: ". $this->iterator->current(), $this->iterator->key());
+                    throw new \LogicException('Invalid repeatition symbol: '.$this->iterator->current(), $this->iterator->key());
             }
             $this->iterator->next();
         }
 
-        
         $this->throwUnexpectedEndOfInputException('}');
     }
 

@@ -6,14 +6,14 @@ namespace Joaobarreto255\PhpCompBuilder\Tests\Lexer\Pattern;
 
 use Joaobarreto255\PhpCompBuilder\Lexer\Pattern\BuilderHandler;
 use Joaobarreto255\PhpCompBuilder\Lexer\Pattern\Symbol\UniqueSymbol;
-use Joaobarreto255\PhpCompBuilder\Lexer\Pattern\Symbol\SymbolInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\TestDox;
 use PHPUnit\Framework\TestCase;
 
+#[CoversClass(BuilderHandler::class)]
 class BuilderHandlerTest extends TestCase
 {
+    #[TestDox('Test process single symble ...')]
     public function testProcessSingleSymbol()
     {
         $handler = new BuilderHandler('foo');
