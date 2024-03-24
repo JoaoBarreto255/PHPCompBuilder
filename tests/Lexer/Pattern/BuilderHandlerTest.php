@@ -10,6 +10,7 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\TestDox;
 use PHPUnit\Framework\TestCase;
 
+
 #[CoversClass(BuilderHandler::class)]
 class BuilderHandlerTest extends TestCase
 {
@@ -32,6 +33,73 @@ class BuilderHandlerTest extends TestCase
         $symbols = $this->assertSymbols($handler, 3);
         $this->assertInstanceOf(UniqueSymbol::class, $symbols[2]);
         $this->assertSame('o', $symbols[2]->value);
+    }
+
+    #[TestDox('Test process symbol after "\\" symbol')]
+    public function testProcessAfterBarSymbol()
+    {
+        $handler = new BuilderHandler('\[\]\{\}\(\)\.\+\*\\\\ab');
+        $handler->processAfterBarSymbol();
+        $pos = 0;
+        $symbols = $this->assertSymbols($handler, 1);
+        $this->assertInstanceOf(UniqueSymbol::class, $symbols[$pos]);
+        $this->assertSame('[', $symbols[$pos++]->value);
+
+        $handler->processAfterBarSymbol();
+        $symbols = $this->assertSymbols($handler, $pos + 1);
+        $this->assertInstanceOf(UniqueSymbol::class, $symbols[$pos]);
+        $this->assertSame(']', $symbols[$pos++]->value);
+
+        $handler->processAfterBarSymbol();
+        $symbols = $this->assertSymbols($handler, $pos + 1);
+        $this->assertInstanceOf(UniqueSymbol::class, $symbols[$pos]);
+        $this->assertSame('{', $symbols[$pos++]->value);
+
+        $handler->processAfterBarSymbol();
+        $symbols = $this->assertSymbols($handler, $pos + 1);
+        $this->assertInstanceOf(UniqueSymbol::class, $symbols[$pos]);
+        $this->assertSame('}', $symbols[$pos++]->value);
+
+        $handler->processAfterBarSymbol();
+        $symbols = $this->assertSymbols($handler, $pos + 1);
+        $this->assertInstanceOf(UniqueSymbol::class, $symbols[$pos]);
+        $this->assertSame('(', $symbols[$pos++]->value);
+
+        $handler->processAfterBarSymbol();
+        $symbols = $this->assertSymbols($handler, $pos + 1);
+        $this->assertInstanceOf(UniqueSymbol::class, $symbols[$pos]);
+        $this->assertSame(')', $symbols[$pos++]->value);
+
+        $handler->processAfterBarSymbol();
+        $symbols = $this->assertSymbols($handler, $pos + 1);
+        $this->assertInstanceOf(UniqueSymbol::class, $symbols[$pos]);
+        $this->assertSame('.', $symbols[$pos++]->value);
+
+        $handler->processAfterBarSymbol();
+        $symbols = $this->assertSymbols($handler, $pos + 1);
+        $this->assertInstanceOf(UniqueSymbol::class, $symbols[$pos]);
+        $this->assertSame('+', $symbols[$pos++]->value);
+
+        $handler->processAfterBarSymbol();
+        $symbols = $this->assertSymbols($handler, $pos + 1);
+        $this->assertInstanceOf(UniqueSymbol::class, $symbols[$pos]);
+        $this->assertSame('*', $symbols[$pos++]->value);
+
+        $handler->processAfterBarSymbol();
+        $symbols = $this->assertSymbols($handler, $pos + 1);
+        $this->assertInstanceOf(UniqueSymbol::class, $symbols[$pos]);
+        $this->assertSame('\\', $symbols[$pos]->value);
+
+        // ignore case
+        $handler->processAfterBarSymbol();
+        $symbols = $this->assertSymbols($handler, $pos + 1);
+        $this->assertInstanceOf(UniqueSymbol::class, $symbols[$pos]);
+        $this->assertSame('\\', $symbols[$pos]->value);
+
+        $handler->processAfterBarSymbol();
+        $symbols = $this->assertSymbols($handler, $pos + 1);
+        $this->assertInstanceOf(UniqueSymbol::class, $symbols[$pos]);
+        $this->assertSame('\\', $symbols[$pos]->value);
     }
 
     public function assertSymbols(BuilderHandler $handler, int $count): array
