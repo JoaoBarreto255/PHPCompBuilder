@@ -9,7 +9,9 @@ use Joaobarreto255\PhpCompBuilder\Lexer\Pattern\Exception\UnexpectedSymbolExcept
 use Joaobarreto255\PhpCompBuilder\Lexer\Pattern\Symbol\ClassSymbol;
 use Joaobarreto255\PhpCompBuilder\Lexer\Pattern\Symbol\GroupSymbol;
 use Joaobarreto255\PhpCompBuilder\Lexer\Pattern\Symbol\UniqueSymbol;
-
+/**
+ * @deprecated
+ */
 class BuilderHandler
 {
     public const CODE_BAR = 92;   // ASCII code for backslash (\)
