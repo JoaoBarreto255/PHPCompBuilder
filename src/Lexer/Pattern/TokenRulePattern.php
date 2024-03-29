@@ -5,28 +5,28 @@ declare(strict_types=1);
 namespace Joaobarreto255\PhpCompBuilder\Lexer\Pattern;
 
 use Attribute;
-use RegexIterator;
 
-#[Attribute(Attribute::TARGET_METHOD | Attribute::TARGET_FUNCTION)]
-class TokenRulePattern
+#[Attribute(Attribute::TARGET_METHOD)]
+readonly class TokenRulePattern
 {
-    readonly private string $pattern;
-    readonly private bool $reserved;
+    public string $pattern;
 
     public function __construct(
         string $pattern,
-        bool $reserved=false
+        public bool $reserved=false
     ) {
         if (empty($pattern)) {
             throw new \LogicException("Pattern must not be empty");
         }
 
-        $this->reserved = $reserved;
-        $this->pattern = $pattern;
-    }
+        if (0 !== strpos($pattern, '/')) {
+            $pattern = '/' . $pattern;
+        }
 
-    public function buildIterator(\Iterator $input, callable $callback): TokenRuleIterator
-    {
-        return new TokenRuleIterator($this, $input, $callback);
+        if ('/' !== substr($pattern, -1) || '\\' === substr($pattern, -1, 1)) {
+            $pattern .= '/';
+        }
+
+        $this->pattern = $pattern;
     }
 }

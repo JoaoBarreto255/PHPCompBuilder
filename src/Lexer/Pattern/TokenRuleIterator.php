@@ -4,22 +4,29 @@ declare(strict_types=1);
 
 namespace Joaobarreto255\PhpCompBuilder\Lexer\Pattern;
 
-use Iterator;
-use \RegexIterator;
+use ArrayIterator;
 
-class TokenRuleIterator extends RegexIterator
+class TokenRuleIterator extends ArrayIterator
 {
+    readonly public string $input;
     readonly public TokenRulePattern $tokenRulePattern;
-    readonly protected callable $callback;
 
-    public function __construct(
-        \IteratorIterface $iterator,
-        TokenRulePattern $tokenRulePattern,
-        callable $callback,
-    ) {
-        $this->callback = $callback;
+    public function __construct(string $input, TokenRulePattern $tokenRulePattern) {
+        $this->input = $input;
         $this->tokenRulePattern = $tokenRulePattern;
 
-        parent::__construct($iterator, $tokenRulePattern->pattern, RegexIterator::ALL_MATCHES, RegexIterator::USE_KEYS, PREG_OFFSET_CAPTURE);
+        $results = [];
+        if (false !== preg_match_all($tokenRulePattern->pattern, $input, $matches, PREG_OFFSET_CAPTURE | PREG_SET_ORDER)) {
+            foreach($matches as $match) {
+                if (empty($match) || !is_array($match)) {
+                    continue;
+                }
+    
+                [$value, $key] = array_shift($match);
+                $results[$key] = $value;
+            }   
+        }
+
+        parent::__construct($results);
     }
 }
