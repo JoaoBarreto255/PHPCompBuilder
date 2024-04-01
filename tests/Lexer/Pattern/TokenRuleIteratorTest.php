@@ -11,7 +11,11 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\TestDox;
 use PHPUnit\Framework\TestCase;
 
-
+/**
+ * @internal
+ *
+ * @coversNothing
+ */
 #[CoversClass(TokenRuleIterator::class)]
 class TokenRuleIteratorTest extends TestCase
 {
@@ -35,7 +39,7 @@ class TokenRuleIteratorTest extends TestCase
     public static function dataProvider(): array
     {
         return [
-            [new TokenRulePattern('foo'), 'foobarbaz' ,[[0, 'foo']]],
+            [new TokenRulePattern('foo'), 'foobarbaz', [[0, 'foo']]],
             [new TokenRulePattern('foo'), 'barfoobaz', [[3, 'foo']]],
             [new TokenRulePattern('foo'), 'barbazfoo', [[6, 'foo']]],
             [new TokenRulePattern('zig'), 'barbazfoo', []],
@@ -45,14 +49,14 @@ class TokenRuleIteratorTest extends TestCase
             ]],
             [new TokenRulePattern('/z.g/'), 'zigzaggzigzag', [
                 [0, 'zig'],
-                [3, 'zag'],               
+                [3, 'zag'],
                 [7, 'zig'],
                 [10, 'zag'],
             ]],
             [new TokenRulePattern('/(?<name>(bar)(biz)(boo))/'), 'barbizboooobzibrabbarbizboo', [
                 [0, 'barbizboo'],
                 [18, 'barbizboo'],
-            ]]
+            ]],
         ];
     }
 }
