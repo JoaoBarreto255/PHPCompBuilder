@@ -11,7 +11,8 @@ readonly class TokenRulePattern
 
     public function __construct(
         string $pattern,
-        public bool $reserved = false
+        public bool $reserved = false,
+        public bool $caseInsensitive = false
     ) {
         if (empty($pattern)) {
             throw new \LogicException('Pattern must not be empty');
@@ -21,8 +22,12 @@ readonly class TokenRulePattern
             $pattern = '/'.$pattern;
         }
 
-        if ('/' !== substr($pattern, -1) || '\\' === substr($pattern, -1, 1)) {
+        if (preg_match('/\/\w?$/', $pattern)) {
             $pattern .= '/';
+        }
+
+        if ($caseInsensitive) {
+            $pattern .= 'i';
         }
 
         $this->pattern = $pattern;
