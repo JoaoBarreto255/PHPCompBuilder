@@ -18,7 +18,8 @@ abstract class AbstractLexer implements \Iterator
     protected ?\Generator $tokenStream = null;
 
     public function __construct(
-        readonly private \Iterator $streamIterator
+        readonly private \Iterator $streamIterator,
+        readonly public string $filename
     ) {
         $this->patterns = $this->getTokenRuleFromMethods();
         $this->tokenStream = $this->buildTokenStream();
@@ -71,6 +72,12 @@ abstract class AbstractLexer implements \Iterator
                         continue;
                     }
 
+                    // exlude any invalid tokens between another big one.
+                    while ($iterator->key() < $this->col) {
+                        $iterator->next();
+                    }
+
+                    // avoid process token not in current position.
                     if ($iterator->key() > $this->col) {
                         continue;
                     }
@@ -107,9 +114,18 @@ abstract class AbstractLexer implements \Iterator
                     continue;
                 }
 
-                throw new \LogicException("Error in scan tokens at position: (line: {$this->lineno}, column: {$this->col})", 503);
+                $this->throwInvalidCharacterException();
+            }
+
+            if ($this->streamIterator->valid()) {
+                $this->throwInvalidCharacterException();
             }
         }
+    }
+
+    protected function throwInvalidCharacterException(): void
+    {
+        throw new InvalidCharacterException($this->filename, $this->input[$this->col], $this->pos, $this->lineno, $this->col);
     }
 
     private function factoryIteratorsFromInput(): array
