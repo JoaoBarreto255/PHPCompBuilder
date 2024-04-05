@@ -22,7 +22,7 @@ readonly class TokenRulePattern
             $pattern = '/'.$pattern;
         }
 
-        if (preg_match('/\/\w?$/', $pattern)) {
+        if (!preg_match('/.*[^\\\]\/\w?$/', $pattern)) {
             $pattern .= '/';
         }
 
