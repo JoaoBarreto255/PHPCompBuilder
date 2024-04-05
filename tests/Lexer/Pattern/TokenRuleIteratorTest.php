@@ -53,6 +53,12 @@ class TokenRuleIteratorTest extends TestCase
                 [7, 'zig'],
                 [10, 'zag'],
             ]],
+            [new TokenRulePattern('/z.g/i'), 'zigzaggzigzag', [
+                [0, 'zig'],
+                [3, 'zag'],
+                [7, 'zig'],
+                [10, 'zag'],
+            ]],
             [new TokenRulePattern('/(?<name>(bar)(biz)(boo))/'), 'barbizboooobzibrabbarbizboo', [
                 [0, 'barbizboo'],
                 [18, 'barbizboo'],
