@@ -11,7 +11,7 @@ abstract class AbstractLexer implements \Iterator
 {
     private readonly array $patterns;
     private string $input = '';
-    private string $value = '';
+    private string $val = '';
     private int $pos = 0;
     private int $lineno = 0;
     private int $col = 0;
@@ -103,12 +103,12 @@ abstract class AbstractLexer implements \Iterator
                 }
 
                 if (null !== $curr) {
-                    $this->value = $curr->value;
+                    $this->val = $curr->value;
                     $method = $curr->func;
 
                     yield $this->{$method}();
 
-                    $this->value = '';
+                    $this->val = '';
                     $this->pos += $curr->len;
                     $this->col += $curr->len;
                     continue;
@@ -140,9 +140,34 @@ abstract class AbstractLexer implements \Iterator
         return $iterators;
     }
 
-    protected function ignorePatternAction(int $pos, string $value, int $line)
+    protected function ignorePatternAction()
     {
         return null;
+    }
+
+    public function value(): string
+    {
+        return $this->val;
+    }
+
+    public function position(): int
+    {
+        return $this->pos;
+    }
+
+    public function column(): int
+    {
+        return $this->col;
+    }
+
+    public function lineNumber(): int
+    {
+        return $this->lineno;
+    }
+
+    public function line(): string
+    {
+        return $this->input;
     }
 
     /**
