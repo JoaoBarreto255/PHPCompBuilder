@@ -139,8 +139,8 @@ abstract class AbstractLexer implements \Iterator
             $iterators = $this->factoryIteratorsFromInput();
 
             $this->col = 0;
-            $curr = null;
             while (true) {
+                $curr = null;
                 foreach ($iterators as $key => $iteratorData) {
                     $func = $iteratorData['method'];
                     $iterator = $iteratorData['iterator'];
@@ -170,10 +170,8 @@ abstract class AbstractLexer implements \Iterator
                         $curr = $new;
                         continue;
                     }
-
-                    if ($iterator->tokenRulePattern->reserved) {
-                        $curr = $new;
-                    }
+                    if (null !== $curr && $new->len < $curr->len) { continue; }
+                    if ($iterator->tokenRulePattern->reserved) { $curr = $new; }
                 }
 
                 if (empty($iterators)) {
@@ -184,7 +182,9 @@ abstract class AbstractLexer implements \Iterator
                     $this->val = $curr->value;
                     $method = $curr->func;
 
-                    yield $this->{$method}();
+                    if($result = $this->{$method}()) {
+                        yield $result;
+                    }
 
                     $this->val = '';
                     $this->pos += $curr->len;
@@ -195,7 +195,7 @@ abstract class AbstractLexer implements \Iterator
                 $this->throwInvalidCharacterException();
             }
 
-            if ($this->streamIterator->valid()) {
+            if (strlen($this->line()) < $this->col) {
                 $this->throwInvalidCharacterException();
             }
         }
