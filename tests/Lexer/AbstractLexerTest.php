@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Joaobarreto255\PhpCompBuilder\Tests\Lexer;
 
 use Joaobarreto255\PhpCompBuilder\Lexer\AbstractLexer;
+use Joaobarreto255\PhpCompBuilder\Lexer\Pattern\TokenRuleIterator;
 use Joaobarreto255\PhpCompBuilder\Lexer\Pattern\TokenRulePattern;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
@@ -99,5 +100,30 @@ class AbstractLexerTest extends TestCase
             ['num', '/\d+/', false],
             ['ignorePatternAction', '/\s+/', false],
         ], $refinedResult);
+    }
+
+    public function testFactoryIteratorsFromInput()
+    {
+        $this->iterator = new \ArrayIterator(['for i2a in Range 10']);
+        $lexer = $this->buildSampleLexer();
+
+        $reflection = new \ReflectionClass($lexer);
+        $reflMethod = $reflection->getMethod('factoryIteratorsFromInput');
+        $reflMethod->setAccessible(true);
+        $method = $reflMethod->getClosure($lexer);
+        $result = $method();
+
+        $this->assertIsArray($result);
+        $this->assertCount(6, $result);
+        foreach ($result as $key => $itArr) {
+            $msg = "fail at iterator row ({$key})";
+            $this->assertIsArray($itArr, $msg);
+            $this->assertCount(2, $itArr, $msg);
+            $this->assertArrayHasKey('method', $itArr, $msg);
+            $this->assertIsString($itArr['method'], $msg);
+            $this->assertNotEmpty($itArr['method'], $msg);
+            $this->assertArrayHasKey('iterator', $itArr, $msg);
+            $this->assertInstanceOf(TokenRuleIterator::class, $itArr['iterator']);
+        }
     }
 }
