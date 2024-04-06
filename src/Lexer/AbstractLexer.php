@@ -94,7 +94,7 @@ abstract class AbstractLexer implements \Iterator
     /**
      * returns current token.
      */
-    public function current()
+    public function current(): mixed
     {
         return $this->tokenStream->current();
     }
@@ -110,7 +110,7 @@ abstract class AbstractLexer implements \Iterator
     /**
      * Returns "key", number off tokens processed.
      */
-    public function key()
+    public function key(): mixed
     {
         return $this->tokenStream->key();
     }
@@ -283,7 +283,7 @@ abstract class AbstractLexer implements \Iterator
             foreach ($tokenRules as $rule) {
                 $result[] = [
                     'method' => $methodName,
-                    'tokenRule' => $rule,
+                    'tokenRule' => $rule->newInstance(),
                 ];
             }
         }
