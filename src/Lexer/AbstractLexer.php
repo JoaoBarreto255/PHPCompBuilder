@@ -213,8 +213,8 @@ abstract class AbstractLexer implements \Iterator
     {
         $iterators = $this->patterns;
         foreach ($iterators as $key => $pattern) {
-            $pattern['iterator'] = new TokenRuleIterator($this->input, $pattern['rule']);
-            unset($pattern['rule']);
+            $pattern['iterator'] = new TokenRuleIterator($this->input, $pattern['tokenRule']);
+            unset($pattern['tokenRule']);
             $iterators[$key] = $pattern;
         }
 
