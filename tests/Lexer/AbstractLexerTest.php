@@ -46,7 +46,7 @@ class AbstractLexerTest extends TestCase
                 return $this->makeReturn(__FUNCTION__);
             }
 
-            #[TokenRulePattern('[A-Z][A-Za-z0-9_]')]
+            #[TokenRulePattern('[A-Z][A-Za-z0-9_]*')]
             public function func(): array
             {
                 return $this->makeReturn(__FUNCTION__);
@@ -183,14 +183,14 @@ class AbstractLexerTest extends TestCase
         $token = $tokenStream->current();
         $this->assertIsArray($token);
         $this->assertCount(6, $token);
-        $this->assertSame(['Foo', 39, 2, 5, "   \t Foo For\n", "func"], $token);
+        $this->assertSame(['Foo', 37, 2, 5, "   \t Foo For\n", "func"], $token);
         $tokenStream->next();
 
         $this->assertTrue($tokenStream->valid());
         $token = $tokenStream->current();
         $this->assertIsArray($token);
         $this->assertCount(6, $token);
-        $this->assertSame(['For', 43, 2, 9, "   \t Foo For\n", "func"], $token);
+        $this->assertSame(['For', 41, 2, 9, "   \t Foo For\n", "func"], $token);
         $tokenStream->next();
     }
 }
