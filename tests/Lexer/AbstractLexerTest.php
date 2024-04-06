@@ -18,11 +18,9 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(AbstractLexer::class)]
 class AbstractLexerTest extends TestCase
 {
-    protected ?\ArrayIterator $iterator = null;
-
-    protected function buildSampleLexer(): AbstractLexer
+    protected function buildSampleLexer(array $iterator = []): AbstractLexer
     {
-        return new class($this->iterator ?? new \ArrayIterator(), 'teste.php') extends AbstractLexer {
+        return new class(new \ArrayIterator($iterator), 'teste.php') extends AbstractLexer {
             public function makeReturn(string $method): array
             {
                 return [
@@ -104,8 +102,7 @@ class AbstractLexerTest extends TestCase
 
     public function testFactoryIteratorsFromInput()
     {
-        $this->iterator = new \ArrayIterator(['for i2a in Range 10']);
-        $lexer = $this->buildSampleLexer();
+        $lexer = $this->buildSampleLexer(['for i2a in Range 10']);
 
         $reflection = new \ReflectionClass($lexer);
         $reflMethod = $reflection->getMethod('factoryIteratorsFromInput');
