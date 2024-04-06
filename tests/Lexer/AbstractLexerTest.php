@@ -65,14 +65,20 @@ class AbstractLexerTest extends TestCase
         };
     }
 
+    protected function exposeHiddenMethod(string $methodName, AbstractLexer $lexer): \Closure
+    {
+        $reflection = new \ReflectionClass($lexer);
+        $reflMethod = $reflection->getMethod($methodName);
+        $reflMethod->setAccessible(true);
+
+        return $reflMethod->getClosure($lexer);
+    }
+
     public function testGetTokenRuleFromMethods()
     {
         $lexer = $this->buildSampleLexer();
+        $method = $this->exposeHiddenMethod('getTokenRuleFromMethods', $lexer);
 
-        $reflection = new \ReflectionClass($lexer);
-        $reflMethod = $reflection->getMethod('getTokenRuleFromMethods');
-        $reflMethod->setAccessible(true);
-        $method = $reflMethod->getClosure($lexer);
         $result = $method();
         $this->assertIsArray($result);
         $this->assertCount(6, $result);
@@ -103,11 +109,8 @@ class AbstractLexerTest extends TestCase
     public function testFactoryIteratorsFromInput()
     {
         $lexer = $this->buildSampleLexer(['for i2a in Range 10']);
+        $method = $this->exposeHiddenMethod('factoryIteratorsFromInput', $lexer);
 
-        $reflection = new \ReflectionClass($lexer);
-        $reflMethod = $reflection->getMethod('factoryIteratorsFromInput');
-        $reflMethod->setAccessible(true);
-        $method = $reflMethod->getClosure($lexer);
         $result = $method();
 
         $this->assertIsArray($result);
