@@ -126,7 +126,7 @@ class AbstractLexerTest extends TestCase
             $this->assertInstanceOf(TokenRuleIterator::class, $itArr['iterator']);
         }
     }
-  
+
     public function testBuildTokenStream()
     {
         $lexer = $this->buildSampleLexer([
@@ -141,56 +141,56 @@ class AbstractLexerTest extends TestCase
         $token = $tokenStream->current();
         $this->assertIsArray($token);
         $this->assertCount(6, $token);
-        $this->assertSame(['abc', 0, 0, 0, "abc for i23 inoske 234 in\n\r", "varName"], $token);
+        $this->assertSame(['abc', 0, 0, 0, "abc for i23 inoske 234 in\n\r", 'varName'], $token);
         $tokenStream->next();
 
         $this->assertTrue($tokenStream->valid());
         $token = $tokenStream->current();
         $this->assertIsArray($token);
         $this->assertCount(6, $token);
-        $this->assertSame(['for', 4, 0, 4, "abc for i23 inoske 234 in\n\r", "reserved"], $token);
+        $this->assertSame(['for', 4, 0, 4, "abc for i23 inoske 234 in\n\r", 'reserved'], $token);
         $tokenStream->next();
 
         $this->assertTrue($tokenStream->valid());
         $token = $tokenStream->current();
         $this->assertIsArray($token);
         $this->assertCount(6, $token);
-        $this->assertSame(['i23', 8, 0, 8, "abc for i23 inoske 234 in\n\r", "varName"], $token);
+        $this->assertSame(['i23', 8, 0, 8, "abc for i23 inoske 234 in\n\r", 'varName'], $token);
         $tokenStream->next();
 
         $this->assertTrue($tokenStream->valid());
         $token = $tokenStream->current();
         $this->assertIsArray($token);
         $this->assertCount(6, $token);
-        $this->assertSame(['inoske', 12, 0, 12, "abc for i23 inoske 234 in\n\r", "varName"], $token);
+        $this->assertSame(['inoske', 12, 0, 12, "abc for i23 inoske 234 in\n\r", 'varName'], $token);
         $tokenStream->next();
 
         $this->assertTrue($tokenStream->valid());
         $token = $tokenStream->current();
         $this->assertIsArray($token);
         $this->assertCount(6, $token);
-        $this->assertSame(['234', 19, 0, 19, "abc for i23 inoske 234 in\n\r", "num"], $token);
+        $this->assertSame(['234', 19, 0, 19, "abc for i23 inoske 234 in\n\r", 'num'], $token);
         $tokenStream->next();
 
         $this->assertTrue($tokenStream->valid());
         $token = $tokenStream->current();
         $this->assertIsArray($token);
         $this->assertCount(6, $token);
-        $this->assertSame(['in', 23, 0, 23, "abc for i23 inoske 234 in\n\r", "reserved"], $token);
+        $this->assertSame(['in', 23, 0, 23, "abc for i23 inoske 234 in\n\r", 'reserved'], $token);
         $tokenStream->next();
 
         $this->assertTrue($tokenStream->valid());
         $token = $tokenStream->current();
         $this->assertIsArray($token);
         $this->assertCount(6, $token);
-        $this->assertSame(['Foo', 37, 2, 5, "   \t Foo For\n", "func"], $token);
+        $this->assertSame(['Foo', 37, 2, 5, "   \t Foo For\n", 'func'], $token);
         $tokenStream->next();
 
         $this->assertTrue($tokenStream->valid());
         $token = $tokenStream->current();
         $this->assertIsArray($token);
         $this->assertCount(6, $token);
-        $this->assertSame(['For', 41, 2, 9, "   \t Foo For\n", "func"], $token);
+        $this->assertSame(['For', 41, 2, 9, "   \t Foo For\n", 'func'], $token);
         $tokenStream->next();
     }
 }
