@@ -131,6 +131,49 @@ abstract class AbstractLexer implements \Iterator
         return $this->tokenStream->valid();
     }
 
+    private function peekRightToken(array &$iterators): ?\stdClass
+    {
+        $result = null;
+        foreach ($iterators as $key => $iteratorData) {
+            $func = $iteratorData['method'];
+            $iterator = $iteratorData['iterator'];
+
+            // exlude any invalid tokens between another big one.
+            while ($iterator->valid() && $iterator->key() < $this->col) {
+                $iterator->next();
+            }
+
+            if (!$iterator->valid()) {
+                unset($iterators[$key]);
+                continue;
+            }
+
+            // avoid process token not in current position.
+            if ($iterator->key() > $this->col) {
+                continue;
+            }
+
+            $new = new \stdClass();
+            $new->func = $func;
+            $new->value = $iterator->current();
+            $new->len = strlen($new->value);
+
+            $iterator->next();
+            if (null === $result || $new->len > $result->len) {
+                $result = $new;
+                continue;
+            }
+            if (null !== $result && $new->len < $result->len) {
+                continue;
+            }
+            if ($iterator->tokenRulePattern->reserved) {
+                $result = $new;
+            }
+        }
+
+        return $result;
+    }
+
     private function buildTokenStream(): \Generator
     {
         foreach ($this->streamIterator as $lineno => $line) {
@@ -140,56 +183,22 @@ abstract class AbstractLexer implements \Iterator
 
             $this->col = 0;
             while (true) {
-                $curr = null;
-                foreach ($iterators as $key => $iteratorData) {
-                    $func = $iteratorData['method'];
-                    $iterator = $iteratorData['iterator'];
+                if ($tokenData = $this->peekRightToken($iterators)) {
+                    $this->val = $tokenData->value;
+                    $method = $tokenData->func;
 
-                    // exlude any invalid tokens between another big one.
-                    while ($iterator->valid() && $iterator->key() < $this->col) {
-                        $iterator->next();
-                    }
-
-                    if (!$iterator->valid()) {
-                        unset($iterators[$key]);
-                        continue;
-                    }
-
-                    // avoid process token not in current position.
-                    if ($iterator->key() > $this->col) {
-                        continue;
-                    }
-
-                    $new = new \stdClass();
-                    $new->func = $func;
-                    $new->value = $iterator->current();
-                    $new->len = strlen($new->value);
-
-                    $iterator->next();
-                    if (null === $curr || $new->len > $curr->len) {
-                        $curr = $new;
-                        continue;
-                    }
-                    if (null !== $curr && $new->len < $curr->len) { continue; }
-                    if ($iterator->tokenRulePattern->reserved) { $curr = $new; }
-                }
-
-                if (empty($iterators)) {
-                    break;
-                }
-
-                if (null !== $curr) {
-                    $this->val = $curr->value;
-                    $method = $curr->func;
-
-                    if($result = $this->{$method}()) {
+                    if ($result = $this->{$method}()) {
                         yield $result;
                     }
 
                     $this->val = '';
-                    $this->pos += $curr->len;
-                    $this->col += $curr->len;
+                    $this->pos += $tokenData->len;
+                    $this->col += $tokenData->len;
                     continue;
+                }
+
+                if (empty($iterators)) {
+                    break;
                 }
 
                 $this->throwInvalidCharacterException();
