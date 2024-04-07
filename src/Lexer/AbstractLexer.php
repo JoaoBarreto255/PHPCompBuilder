@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Joaobarreto255\PhpCompBuilder\Lexer;
+namespace JB255\PHPCompBuilder\Lexer;
 
-use Joaobarreto255\PhpCompBuilder\Lexer\Pattern\TokenRuleIterator;
-use Joaobarreto255\PhpCompBuilder\Lexer\Pattern\TokenRulePattern;
+use JB255\PHPCompBuilder\Lexer\Pattern\TokenRuleIterator;
+use JB255\PHPCompBuilder\Lexer\Pattern\TokenRulePattern;
 
 /**
  * Classe abstrata que fornece uma estrutura básica para criar analisadores lexicais (lexers) em PHP.

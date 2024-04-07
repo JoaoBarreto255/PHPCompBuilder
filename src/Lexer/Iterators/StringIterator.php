@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Joaobarreto255\PhpCompBuilder\Lexer\Iterators;
+namespace JB255\PHPCompBuilder\Lexer\Iterators;
 
 class StringIterator implements \Iterator
 {

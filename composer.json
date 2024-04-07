@@ -9,8 +9,8 @@
     "license": "MIT",
     "autoload": {
         "psr-4": {
-            "Joaobarreto255\\PhpCompBuilder\\Tests\\": "tests/",
-            "Joaobarreto255\\PhpCompBuilder\\": "src/"
+            "JB255\\PHPCompBuilder\\Tests\\": "tests/",
+            "JB255\\PHPCompBuilder\\": "src/"
         }
     },
     "authors": [

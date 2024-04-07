@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Joaobarreto255\PhpCompBuilder\Tests\Lexer\Iterators;
+namespace JB255\PHPCompBuilder\Tests\Lexer\Iterators;
 
-use Joaobarreto255\PhpCompBuilder\Lexer\Iterators\StringIterator;
+use JB255\PHPCompBuilder\Lexer\Iterators\StringIterator;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\TestDox;

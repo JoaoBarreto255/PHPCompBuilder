@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Joaobarreto255\PhpCompBuilder\Tests\Lexer;
+namespace JB255\PHPCompBuilder\Tests\Lexer;
 
-use Joaobarreto255\PhpCompBuilder\Lexer\AbstractLexer;
-use Joaobarreto255\PhpCompBuilder\Lexer\Pattern\TokenRuleIterator;
-use Joaobarreto255\PhpCompBuilder\Lexer\Pattern\TokenRulePattern;
+use JB255\PHPCompBuilder\Lexer\AbstractLexer;
+use JB255\PHPCompBuilder\Lexer\Pattern\TokenRuleIterator;
+use JB255\PHPCompBuilder\Lexer\Pattern\TokenRulePattern;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 

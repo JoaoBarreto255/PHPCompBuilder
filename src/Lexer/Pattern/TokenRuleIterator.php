@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Joaobarreto255\PhpCompBuilder\Lexer\Pattern;
+namespace JB255\PHPCompBuilder\Lexer\Pattern;
 
 class TokenRuleIterator extends \ArrayIterator
 {
