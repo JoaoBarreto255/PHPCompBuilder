@@ -145,14 +145,14 @@ abstract class AbstractLexer implements \Iterator
                     $func = $iteratorData['method'];
                     $iterator = $iteratorData['iterator'];
 
+                    // exlude any invalid tokens between another big one.
+                    while ($iterator->valid() && $iterator->key() < $this->col) {
+                        $iterator->next();
+                    }
+
                     if (!$iterator->valid()) {
                         unset($iterators[$key]);
                         continue;
-                    }
-
-                    // exlude any invalid tokens between another big one.
-                    while ($iterator->key() < $this->col) {
-                        $iterator->next();
                     }
 
                     // avoid process token not in current position.
