@@ -55,16 +55,6 @@ class ProductionRule
         return static::$bodyPattern;
     }
 
-    // public static function buildPatternWithHeader(): string
-    // {
-    //     return sprintf('/^(?<header>[[:alpha:]][[:alnum:]\_]*)\s+\:(\s+%s)*$/', static::buildBodyPattern());
-    // }
-
-    // public static function buildPatternWithoutHeader(): string
-    // {
-    //     return sprintf('/^\s*\:(\s+%s)*$/', static::buildBodyPattern());
-    // }
-
     protected function processMatches(array $matches): array
     {
         $result = array_merge(
