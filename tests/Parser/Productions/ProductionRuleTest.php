@@ -74,4 +74,13 @@ class ProductionRuleTest extends TestCase
             next($result);
         }
     }
+
+    public function testCreateProductionRule()
+    {
+        $production = new ProductionRule(new NonTerminal('foo'), "expr 'if' bool_expr 'else' expr");
+        $this->assertCount(5, $production->rule);
+
+        $production = new ProductionRule(new NonTerminal('foo'), "'id' '(' args ')'");
+        $this->assertCount(4, $production->rule);
+    }
 }
