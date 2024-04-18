@@ -8,13 +8,13 @@ use JB255\PHPCompBuilder\Parser\Productions\Symbols\ClassTerminal;
 use JB255\PHPCompBuilder\Parser\Productions\Symbols\NonTerminal;
 use JB255\PHPCompBuilder\Parser\Productions\Symbols\SymbolInterface;
 use JB255\PHPCompBuilder\Parser\Productions\Symbols\Terminal;
+use RuntimeException;
 
 /**
  * Container for Rule of one production.
  */
 class ProductionRule
 {
-    public static string $bodyPattern = '';
     /**
      * @var SymbolInterface[]
      */
@@ -24,57 +24,41 @@ class ProductionRule
         public readonly NonTerminal $header,
         string $rule
     ) {
-        if (false !== preg_match_all(static::buildBodyPattern(), $rule, $matches, PREG_OFFSET_CAPTURE)) {
-            $this->rule = $this->processMatches($matches);
-
-            return;
+        $result = [];
+        if (!empty($rule = trim($rule))) {
+            $valuesArray = preg_split('/\s+/', $rule) ?: [$rule];
+            foreach ($valuesArray as $value) {
+                $result[] = $this->processValue($value);
+            }
         }
 
-        throw new \InvalidArgumentException("Rule is on wrong pattern. It must be in format: '(NonTerminal:) ", 1);
+        $this->rule = $result;
     }
 
-    private static function buildBodyPattern(): string
+    protected function processValue(string $value): SymbolInterface
     {
-        if (static::$bodyPattern) {
-            return static::$bodyPattern;
+        if ($symbol = $this->trySymbol(NonTerminal::class, $value)) {
+            return $symbol;
         }
 
-        $pattern = trim(Terminal::SYMBOL_PATTERN, '/');
-        $pattern = trim($pattern, '^$');
-        static::$bodyPattern = '(?<term>'.$pattern.')';
+        if ($symbol = $this->trySymbol(ClassTerminal::class, $value)) {
+            return $symbol;
+        }
 
-        $pattern = trim(NonTerminal::SYMBOL_PATTERN, '/');
-        $pattern = trim($pattern, '^$');
-        static::$bodyPattern .= '|(?<nterm>'.$pattern.')';
+        if ($symbol = $this->trySymbol(Terminal::class, $value)) {
+            return $symbol;
+        }
 
-        $pattern = trim(ClassTerminal::SYMBOL_PATTERN, '/');
-        $pattern = trim($pattern, '^$');
-        static::$bodyPattern .= '|(?<cterm>'.$pattern.')';
-        static::$bodyPattern = sprintf('/^((%s)\s*)*$/', static::$bodyPattern);
-
-        return static::$bodyPattern;
+        throw new RuntimeException("Unrecoginized symbol in rule: $value");
     }
 
-    protected function processMatches(array $matches): array
+    public function trySymbol(string $classname, string $value): SymbolInterface|false
     {
-        $result = array_merge(
-            $this->processMatchesType($matches['term'] ?? [], Terminal::class),
-            $this->processMatchesType($matches['nterm'] ?? [], NonTerminal::class),
-            $this->processMatchesType($matches['cterm'] ?? [], ClassTerminal::class),
-        );
-        $result = array_values($result);
-
-        uasort($result, fn (array $a, array $b) => $a[1] - $b[1]);
-
-        return array_map('current', $result);
-    }
-
-    protected function processMatchesType(array $matches, string $classname): array
-    {
-        return array_map(
-            fn (array $match): array => [new $classname($match[0]), $match[1]],
-            $matches
-        );
+        try {
+            return new $classname($value);
+        } catch (\Exception|\Error) {
+            return false;
+        }
     }
 
     public function __toString()
