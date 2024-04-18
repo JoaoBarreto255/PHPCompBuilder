@@ -6,7 +6,7 @@ namespace JB255\PHPCompBuilder\Parser\Productions\Symbols;
 
 class ClassTerminal extends Terminal implements SymbolInterface
 {
-    public const SYMBOL_PATTERN = '/^\'[[:alpha:]](\w|\_)*(\\\[[:alpha:]](\w|\_)*)*\'$/i';
+    public const SYMBOL_PATTERN = '/^\'[[:alpha:]](\w|\_)*(\\\[[:alpha:]](\w|\_)*)*\'$/';
 
     protected function extraValueValidation(string $value): void
     {

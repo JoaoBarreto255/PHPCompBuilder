@@ -50,7 +50,7 @@ class ProductionRule
         $pattern = trim(ClassTerminal::SYMBOL_PATTERN, '/');
         $pattern = trim($pattern, '^$');
         static::$bodyPattern .= '|(?<cterm>'.$pattern.')';
-        static::$bodyPattern = sprintf('/^(\s+(%s))$/', static::$bodyPattern);
+        static::$bodyPattern = sprintf('/^((%s)\s*)*$/', static::$bodyPattern);
 
         return static::$bodyPattern;
     }
@@ -62,6 +62,7 @@ class ProductionRule
             $this->processMatchesType($matches['nterm'] ?? [], NonTerminal::class),
             $this->processMatchesType($matches['cterm'] ?? [], ClassTerminal::class),
         );
+        $result = array_values($result);
 
         uasort($result, fn (array $a, array $b) => $a[1] - $b[1]);
 
@@ -71,7 +72,7 @@ class ProductionRule
     protected function processMatchesType(array $matches, string $classname): array
     {
         return array_map(
-            fn (array $matche): array => [new $classname($matche[0]), $matche[1]],
+            fn (array $match): array => [new $classname($match[0]), $match[1]],
             $matches
         );
     }
