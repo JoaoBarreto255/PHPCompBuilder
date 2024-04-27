@@ -30,27 +30,7 @@ namespace JB255\PHPCompBuilder\Lexer;
 interface TokenInterface
 {
     /**
-     * Value tokenized from token.
+     * Number used.
      */
-    public function value(): string|float|int;
-
-    /**
-     * Start token position in scanned file.
-     */
-    public function position(): int;
-
-    /**
-     * Number of current file line scanned.
-     */
-    public function lineno(): int;
-
-    /**
-     * Start of token in current line.
-     */
-    public function column(): int;
-
-    /**
-     * Scanned file.
-     */
-    public function filename(): ?string;
+    public function id(): int;
 }

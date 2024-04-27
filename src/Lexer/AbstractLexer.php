@@ -73,18 +73,22 @@ use JB255\PHPCompBuilder\Lexer\Pattern\TokenRulePattern;
 abstract class AbstractLexer implements \Iterator
 {
     private readonly array $patterns;
+    private readonly \SplObjectStorage $ruleIds;
     private string $input = '';
     private string $val = '';
     private int $pos = 0;
     private int $lineno = 0;
     private int $col = 0;
+    private ?int $tokId = null;
     protected ?\Generator $tokenStream = null;
 
     public function __construct(
         readonly private \Iterator $streamIterator,
-        readonly public string $filename
+        readonly public string $filename,
+        array $patterns
     ) {
-        $this->patterns = $this->getTokenRuleFromMethods();
+        $this->patterns = $patterns ?: $this->getTokenRuleFromMethods();
+        $this->ruleIds = $this->getRuleIds();
         $this->tokenStream = $this->buildTokenStream();
     }
 
@@ -93,6 +97,8 @@ abstract class AbstractLexer implements \Iterator
 
     /**
      * returns current token.
+     * 
+     * @return \JB255\PHPCompBuilder\Lexer\TokenInterface|int
      */
     public function current(): mixed
     {
@@ -157,6 +163,7 @@ abstract class AbstractLexer implements \Iterator
             $new->func = $func;
             $new->value = $iterator->current();
             $new->len = strlen($new->value);
+            $new->tokId = $this->ruleIds[$iterator->tokenRulePattern];
 
             $iterator->next();
             if (null === $result || $new->len > $result->len) {
@@ -185,6 +192,7 @@ abstract class AbstractLexer implements \Iterator
             while (true) {
                 if ($tokenData = $this->peekRightToken($iterators)) {
                     $this->val = $tokenData->value;
+                    $this->tokId = $tokenData->tokId;
                     $method = $tokenData->func;
 
                     if ($result = $this->{$method}()) {
@@ -243,6 +251,13 @@ abstract class AbstractLexer implements \Iterator
         return $this->val;
     }
 
+    /**
+     * Returns current token id.
+     */
+    public function tokenId(): ?int
+    {
+        return $this->tokId;
+    }
     /**
      * Current token position in file.
      */
@@ -307,5 +322,18 @@ abstract class AbstractLexer implements \Iterator
         }
 
         throw new \LogicException('Error no methods to fetch pattern', 1);
+    }
+
+    private function getRuleIds(): \SplObjectStorage
+    {
+        $ruleStorage = new \SplObjectStorage();
+
+        $id = 0;
+        foreach ($this->patterns as $patternArr) {
+            $ruleStorage->attach($patternArr['tokenRule'], $patternArr['tokenRule']->id ?? $id);
+            $id++;
+        }
+
+        return $ruleStorage;
     }
 }
