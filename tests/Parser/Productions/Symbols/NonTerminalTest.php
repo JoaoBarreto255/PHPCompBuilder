@@ -5,12 +5,17 @@ declare(strict_types=1);
 namespace JB255\PHPCompBuilder\Tests\Parser\Productions\Symbols;
 
 use JB255\PHPCompBuilder\Parser\Productions\Symbols\AbstractSymbol;
-use JB255\PHPCompBuilder\Parser\Productions\Symbols\SymbolInterface;
 use JB255\PHPCompBuilder\Parser\Productions\Symbols\NonTerminal;
+use JB255\PHPCompBuilder\Parser\Productions\Symbols\SymbolInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * @internal
+ *
+ * @coversNothing
+ */
 #[CoversClass(NonTerminal::class)]
 class NonTerminalTest extends TestCase
 {

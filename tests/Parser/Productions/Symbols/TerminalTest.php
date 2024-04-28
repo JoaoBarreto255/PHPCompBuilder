@@ -11,6 +11,11 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * @internal
+ *
+ * @coversNothing
+ */
 #[CoversClass(Terminal::class)]
 class TerminalTest extends TestCase
 {
@@ -22,7 +27,7 @@ class TerminalTest extends TestCase
         $this->assertInstanceOf(SymbolInterface::class, $term);
         $this->assertInstanceOf(AbstractSymbol::class, $term);
 
-        $this->assertSame("'$value'", (string) $term);
+        $this->assertSame("'{$value}'", (string) $term);
     }
 
     #[DataProvider('failProvider')]
@@ -63,7 +68,7 @@ class TerminalTest extends TestCase
             ['Foo'],
             ['Barr'],
             ['Barr'],
-            ["'-bar'"]
+            ["'-bar'"],
         ];
     }
 }

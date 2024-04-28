@@ -8,7 +8,6 @@ use JB255\PHPCompBuilder\Parser\Productions\Symbols\ClassTerminal;
 use JB255\PHPCompBuilder\Parser\Productions\Symbols\NonTerminal;
 use JB255\PHPCompBuilder\Parser\Productions\Symbols\SymbolInterface;
 use JB255\PHPCompBuilder\Parser\Productions\Symbols\Terminal;
-use RuntimeException;
 
 /**
  * Container for Rule of one production.
@@ -49,7 +48,7 @@ class ProductionRule
             return $symbol;
         }
 
-        throw new RuntimeException("Unrecoginized symbol in rule: $value");
+        throw new \RuntimeException("Unrecoginized symbol in rule: {$value}");
     }
 
     public function trySymbol(string $classname, string $value): SymbolInterface|false

@@ -10,6 +10,11 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * @internal
+ *
+ * @coversNothing
+ */
 #[CoversClass(AbstractSymbol::class)]
 class AbstractSymbolTest extends TestCase
 {
@@ -20,8 +25,7 @@ class AbstractSymbolTest extends TestCase
             '/ must implement interface "JB255\\\PHPCompBuilder\\\Parser\\\Productions\\\Symbols\\\SymbolInterface"/'
         );
 
-        new class('foo') extends AbstractSymbol
-        { };
+        new class('foo') extends AbstractSymbol { };
     }
 
     public function testSymbolHasEmptyConstant(): void
@@ -29,9 +33,11 @@ class AbstractSymbolTest extends TestCase
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessageMatches('/ have invalid SYMBOL_PATTERN \(""\)\. Redefine yours/');
 
-        new class('foo') extends AbstractSymbol implements SymbolInterface
-        {
-            public function __toString(): string { return 'foo'; }
+        new class('foo') extends AbstractSymbol implements SymbolInterface {
+            public function __toString(): string
+            {
+                return 'foo';
+            }
         };
     }
 
@@ -41,11 +47,13 @@ class AbstractSymbolTest extends TestCase
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessageMatches('/ have invalid SYMBOL_PATTERN \("\/foo\)\/"\)\. Redefine yours/');
 
-        new class('foo') extends AbstractSymbol implements SymbolInterface
-        {
+        new class('foo') extends AbstractSymbol implements SymbolInterface {
             public const SYMBOL_PATTERN = '/foo)/';
 
-            public function __toString(): string { return 'foo'; }
+            public function __toString(): string
+            {
+                return 'foo';
+            }
         };
     }
 
@@ -55,14 +63,20 @@ class AbstractSymbolTest extends TestCase
         $this->expectException($exception);
         $this->expectExceptionMessage($errorMessage);
 
-        new class($value) extends AbstractSymbol implements SymbolInterface
-        {
+        new class($value) extends AbstractSymbol implements SymbolInterface {
             public const SYMBOL_PATTERN = '/foo/';
 
-            public function __toString(): string { return 'foo'; }
+            public function __toString(): string
+            {
+                return 'foo';
+            }
 
             protected function extraValueValidation(string $value): void
-            { if ('foo' !== $value) { throw new \Exception('Bar'); } }
+            {
+                if ('foo' !== $value) {
+                    throw new \Exception('Bar');
+                }
+            }
         };
     }
 

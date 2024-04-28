@@ -6,20 +6,19 @@ namespace JB255\PHPCompBuilder\Parser;
 
 use JB255\PHPCompBuilder\Parser\Attributes\Production;
 use JB255\PHPCompBuilder\Parser\Attributes\TokenAlias;
-use LogicException;
 
 abstract class AbstractParserSchema
 {
     private array $schema = [];
 
     /**
-     * @throws LogicException - When there's no Token alias
+     * @throws \LogicException - When there's no Token alias
      */
     final protected function searchTokenAlias(): void
     {
         $reflection = new \ReflectionClass($this);
         if (empty($reflectionAttrs = $reflection->getAttributes(TokenAlias::class))) {
-            throw new LogicException("All used tokens in lexer must have a token alias", 503);
+            throw new \LogicException('All used tokens in lexer must have a token alias', 503);
         }
 
         $aliases = [];
@@ -32,7 +31,7 @@ abstract class AbstractParserSchema
     }
 
     /**
-     * @throws LogicException - when there's no current productions
+     * @throws \LogicException - when there's no current productions
      */
     final protected function searchProductionMethods(): void
     {
@@ -44,19 +43,19 @@ abstract class AbstractParserSchema
             if (empty($reflectionAttr = current($reflectionMethod->getAttributes(Production::class)))) {
                 continue;
             }
-            
+
             $productions[$reflectionMethod->getName()] = $reflectionAttr->newInstance();
         }
 
         if (empty($productions)) {
-            throw new LogicException("No productions or public methods with productions added!", 1);
+            throw new \LogicException('No productions or public methods with productions added!', 1);
         }
 
         $this->schema['productions'] = $productions;
     }
 
     /**
-     * get class schema
+     * get class schema.
      */
     final public function getSchema(): array
     {

@@ -97,8 +97,8 @@ abstract class AbstractLexer implements \Iterator
 
     /**
      * returns current token.
-     * 
-     * @return \JB255\PHPCompBuilder\Lexer\TokenInterface|int
+     *
+     * @return TokenInterface|int
      */
     public function current(): mixed
     {
@@ -258,6 +258,7 @@ abstract class AbstractLexer implements \Iterator
     {
         return $this->tokId;
     }
+
     /**
      * Current token position in file.
      */
@@ -331,7 +332,7 @@ abstract class AbstractLexer implements \Iterator
         $id = 0;
         foreach ($this->patterns as $patternArr) {
             $ruleStorage->attach($patternArr['tokenRule'], $patternArr['tokenRule']->id ?? $id);
-            $id++;
+            ++$id;
         }
 
         return $ruleStorage;

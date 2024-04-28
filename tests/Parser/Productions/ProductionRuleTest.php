@@ -9,9 +9,13 @@ use JB255\PHPCompBuilder\Parser\Productions\Symbols\ClassTerminal;
 use JB255\PHPCompBuilder\Parser\Productions\Symbols\NonTerminal;
 use JB255\PHPCompBuilder\Parser\Productions\Symbols\Terminal;
 use JB255\PHPCompBuilder\Tests\ReflectionTrait;
-use PHPUnit\Framework\Attributes\TestDox;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * @internal
+ *
+ * @coversNothing
+ */
 class ProductionRuleTest extends TestCase
 {
     use ReflectionTrait;
