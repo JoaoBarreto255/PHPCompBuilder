@@ -10,10 +10,12 @@ use JB255\PHPCompBuilder\Lexer\Pattern\Exception\InvalidParameterTypeException;
 readonly class TokenRulePattern
 {
     public string $pattern;
+    protected \Closure $callback;
 
     public function __construct(
+        public string $tokenName,
         string $pattern,
-        protected \Closure $callback,
+        ?\Closure $callback = null,
         public bool $reserved = false,
         public bool $caseInsensitive = false,
     ) {
@@ -34,7 +36,12 @@ readonly class TokenRulePattern
         }
 
         $this->pattern = $pattern;
+        if (null === $callback) {
+            $callback = fn($v) => null;
+        }
+
         $this->validateParameters($callback);
+        $this->callback = $callback;
     }
 
     protected function validateParameters(\Closure $closure): void
