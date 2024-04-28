@@ -4,18 +4,18 @@ declare(strict_types=1);
 
 namespace JB255\PHPCompBuilder\Lexer\Pattern;
 
-use JB255\PHPCompBuilder\Lexer\TokenInterface;
+use JB255\PHPCompBuilder\Lexer\Pattern\Exception\InvalidParameterTypeException;
 
-#[\Attribute(\Attribute::TARGET_METHOD | \Attribute::IS_REPEATABLE)]
+#[\Attribute(\Attribute::TARGET_CLASS | \Attribute::IS_REPEATABLE)]
 readonly class TokenRulePattern
 {
     public string $pattern;
 
     public function __construct(
         string $pattern,
+        protected \Closure $callback,
         public bool $reserved = false,
         public bool $caseInsensitive = false,
-        public int|TokenInterface|null $id = null
     ) {
         if (empty($pattern)) {
             throw new \LogicException('Pattern must not be empty');
@@ -34,5 +34,84 @@ readonly class TokenRulePattern
         }
 
         $this->pattern = $pattern;
+        $this->validateParameters($callback);
+    }
+
+    protected function validateParameters(\Closure $closure): void
+    {
+        $reflFunc = new \ReflectionFunction($closure);
+        if (0 === $reflFunc->getNumberOfParameters()) {
+            throw new \LogicException('You shall not pass with zero parameters!');
+        }
+
+        if (4 < $reflFunc->getNumberOfRequiredParameters()) {
+            throw new \LogicException('Too many required arguments in closure!');
+        }
+
+        foreach ($reflFunc->getParameters() as $param) {
+            if (4 < ($position = $param->getPosition())) {
+                continue;
+            }
+
+            $this->validateParamType(
+                $param, 0 === $position ? 'string' : 'int'
+            );
+        }
+    }
+
+    protected function validateParamType(\ReflectionParameter $param, string $expected = 'string'): void
+    {
+        if (!$param->hasType()) {
+            return;
+        }
+        if (($type = $param->getType()) instanceof \ReflectionNamedType
+            && $type->getName() === $expected
+        ) {
+            return;
+        }
+
+        if ($type instanceof \ReflectionNamedType) {
+            throw $this->buildInvalidParameterTypeException($param, $expected, $type->getName());
+        }
+
+        if (!$type instanceof \ReflectionUnionType
+            && !$type instanceof \ReflectionIntersectionType
+            && (string) $type !== $expected
+        ) {
+            throw $this->buildInvalidParameterTypeException($param, $expected, (string) $type);
+        }
+
+        $subTypes = array_map(fn ($t) => $t->getName(), $type->getTypes());
+        if ($type instanceof \ReflectionIntersectionType) {
+            throw $this->buildInvalidParameterTypeException($param, $expected, implode('&', $subTypes));
+        }
+
+        if ($type instanceof \ReflectionUnionType 
+            && 0 === count(array_filter($subTypes, fn ($t) => $t === $expected))
+        ) {
+            throw $this->buildInvalidParameterTypeException($param, $expected, implode('&', $subTypes));
+        }
+    }
+
+    protected function buildInvalidParameterTypeException(
+        \ReflectionParameter $param, string $expectedType, string $currentType
+    ): InvalidParameterTypeException {
+        return new InvalidParameterTypeException(
+            'callback', $param->getName(), $expectedType, $currentType
+        );
+    }
+
+    public function executeCallback(
+        string $value, int $positon, int $lineno, int $column
+    ) {
+        $callback = $this->callback;
+        $totalOfArguments = (new \ReflectionFunction($this->callback))->getNumberOfRequiredParameters();
+
+        return match ($totalOfArguments) {
+            1 => $callback($value),
+            2 => $callback($value, $positon),
+            3 => $callback($value, $positon, $lineno),
+            4 => $callback($value, $positon, $lineno, $column),
+        };
     }
 }
