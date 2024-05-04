@@ -19,50 +19,8 @@ use PHPUnit\Framework\TestCase;
 class AbstractLexerTest extends TestCase
 {
     protected function buildSampleLexer(array $iterator = []): AbstractLexer
-    {
-        return new class(new \ArrayIterator($iterator), 'teste.php') extends AbstractLexer {
-            public function makeReturn(string $method): array
-            {
-                return [
-                    $this->value(),
-                    $this->position(),
-                    $this->lineNumber(),
-                    $this->column(),
-                    $this->line(),
-                    $method,
-                ];
-            }
-
-            #[TokenRulePattern('/[a-z](\w|\d|\_)*/')]
-            public function varName(): array
-            {
-                return $this->makeReturn(__FUNCTION__);
-            }
-
-            #[TokenRulePattern('for', true)]
-            #[TokenRulePattern('in', true)]
-            public function reserved(): array
-            {
-                return $this->makeReturn(__FUNCTION__);
-            }
-
-            #[TokenRulePattern('[A-Z][A-Za-z0-9_]*')]
-            public function func(): array
-            {
-                return $this->makeReturn(__FUNCTION__);
-            }
-
-            #[TokenRulePattern('\d+')]
-            public function num(): array
-            {
-                return $this->makeReturn(__FUNCTION__);
-            }
-
-            public function ignorePattern(): string
-            {
-                return '/\s+/';
-            }
-        };
+    {   
+        return new FakeLexer(new \ArrayIterator($iterator), 'test.php');
     }
 
     protected function exposeHiddenMethod(string $methodName, AbstractLexer $lexer): \Closure
