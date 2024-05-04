@@ -6,6 +6,7 @@ namespace JB255\PHPCompBuilder\Lexer;
 
 use JB255\PHPCompBuilder\Lexer\Pattern\TokenRuleIterator;
 use JB255\PHPCompBuilder\Lexer\Pattern\TokenRulePattern;
+use JB255\PHPCompBuilder\Lexer\Pattern\TokenState;
 
 /**
  * Classe abstrata que fornece uma estrutura básica para criar analisadores lexicais (lexers) em PHP.
@@ -73,22 +74,26 @@ use JB255\PHPCompBuilder\Lexer\Pattern\TokenRulePattern;
 abstract class AbstractLexer implements \Iterator
 {
     private readonly array $patterns;
-    private readonly \SplObjectStorage $ruleIds;
     private string $input = '';
     private string $val = '';
     private int $pos = 0;
     private int $lineno = 0;
     private int $col = 0;
-    private ?int $tokId = null;
     protected ?\Generator $tokenStream = null;
+
+    protected static array $lexerRules = [];
+
+    /**
+     * @var JB255\PHPCompBuilder\Lexer\Pattern\TokenRuleIterator[]
+     */
+    private array $iterators = [];
 
     public function __construct(
         readonly private \Iterator $streamIterator,
         readonly public string $filename,
-        array $patterns
+        array $patterns = []
     ) {
-        $this->patterns = $patterns ?: $this->getTokenRuleFromMethods();
-        $this->ruleIds = $this->getRuleIds();
+        $this->patterns = $patterns ?: $this->getTokenRuleFromClass();
         $this->tokenStream = $this->buildTokenStream();
     }
 
@@ -137,20 +142,17 @@ abstract class AbstractLexer implements \Iterator
         return $this->tokenStream->valid();
     }
 
-    private function peekRightToken(array &$iterators): ?\stdClass
+    private function peekRightToken(): ?TokenState
     {
         $result = null;
-        foreach ($iterators as $key => $iteratorData) {
-            $func = $iteratorData['method'];
-            $iterator = $iteratorData['iterator'];
-
+        foreach ($this->iterators as $key => $iterator) {
             // exlude any invalid tokens between another big one.
             while ($iterator->valid() && $iterator->key() < $this->col) {
                 $iterator->next();
             }
 
             if (!$iterator->valid()) {
-                unset($iterators[$key]);
+                unset($this->iterators[$key]);
                 continue;
             }
 
@@ -159,23 +161,17 @@ abstract class AbstractLexer implements \Iterator
                 continue;
             }
 
-            $new = new \stdClass();
-            $new->func = $func;
-            $new->value = $iterator->current();
-            $new->len = strlen($new->value);
-            $new->tokId = $this->ruleIds[$iterator->tokenRulePattern];
-
+            $new = new TokenState($iterator->tokenRulePattern, $iterator->current());
             $iterator->next();
-            if (null === $result || $new->len > $result->len) {
+            if (!$result instanceof TokenState) {
                 $result = $new;
                 continue;
             }
-            if (null !== $result && $new->len < $result->len) {
-                continue;
-            }
-            if ($iterator->tokenRulePattern->reserved) {
-                $result = $new;
-            }
+    
+            $result = match ($new->compare($result)) {
+                1 => $new,
+                default => $result,
+            };
         }
 
         return $result;
@@ -186,16 +182,16 @@ abstract class AbstractLexer implements \Iterator
         foreach ($this->streamIterator as $lineno => $line) {
             $this->input = $line;
             $this->lineno = $lineno;
-            $iterators = $this->factoryIteratorsFromInput();
+            $this->iterators = $this->factoryIteratorsFromInput();
 
             $this->col = 0;
             while (true) {
-                if ($tokenData = $this->peekRightToken($iterators)) {
+                if ($tokenData = $this->peekRightToken()) {
                     $this->val = $tokenData->value;
-                    $this->tokId = $tokenData->tokId;
-                    $method = $tokenData->func;
 
-                    if ($result = $this->{$method}()) {
+                    if ($result = $tokenData->tokenRule->executeCallback(
+                        $this->val, $this->pos, $this->lineno, $this->col
+                    )) {
                         yield $result;
                     }
 
@@ -225,17 +221,15 @@ abstract class AbstractLexer implements \Iterator
 
     /**
      * build for current line TokenRuleIterator.
+     * @return \JB255\PHPCompBuilder\Lexer\Pattern\TokenRuleIterator[]
      */
     private function factoryIteratorsFromInput(): array
     {
-        $iterators = $this->patterns;
-        foreach ($iterators as $key => $pattern) {
-            $pattern['iterator'] = new TokenRuleIterator($this->input, $pattern['tokenRule']);
-            unset($pattern['tokenRule']);
-            $iterators[$key] = $pattern;
-        }
-
-        return $iterators;
+        return array_map(
+            fn(TokenRulePattern $trp) => new TokenRuleIterator(
+                $this->input, $trp
+            ), $this->patterns
+        );
     }
 
     protected function ignorePatternAction()
@@ -249,14 +243,6 @@ abstract class AbstractLexer implements \Iterator
     public function value(): string
     {
         return $this->val;
-    }
-
-    /**
-     * Returns current token id.
-     */
-    public function tokenId(): ?int
-    {
-        return $this->tokId;
     }
 
     /**
@@ -291,50 +277,28 @@ abstract class AbstractLexer implements \Iterator
     /**
      * Build for lexer list of rules to apply to each line.
      *
-     * @return array[] - methods with pattern to be processed
+     * @return \JB255\PHPCompBuilder\Lexer\Pattern\TokenRulePattern[] - methods with pattern to be processed
      */
-    private function getTokenRuleFromMethods(): array
+    private function getTokenRuleFromClass(): array
     {
+        if (isset(static::$lexerRules[static::class])) {
+            return static::$lexerRules[static::class];
+        }
+
         $reflection = new \ReflectionClass($this);
-        $methods = $reflection->getMethods(\ReflectionMethod::IS_PROTECTED | \ReflectionMethod::IS_PUBLIC);
-
-        $result = [];
-        foreach ($methods as $reflMethod) {
-            if (empty($tokenRules = $reflMethod->getAttributes(TokenRulePattern::class))) {
-                continue;
-            }
-
-            $methodName = $reflMethod->getName();
-            foreach ($tokenRules as $rule) {
-                $result[] = [
-                    'method' => $methodName,
-                    'tokenRule' => $rule->newInstance(),
-                ];
-            }
+        if (empty($attributes = $reflection->getAttributes(TokenRulePattern::class))) {
+            throw new \LogicException("Missing token attributes on lexer");
         }
 
-        $result[] = [
-            'method' => 'ignorePatternAction',
-            'tokenRule' => new TokenRulePattern($this->ignorePattern()),
-        ];
+        $attributes = array_map(fn(\ReflectionAttribute $attr) => $attr->newInstance(), $attributes);
+        $attributes[] = new TokenRulePattern(
+            '__ignoreToken', $this->ignorePattern(), fn(string $ignore) => null
+        );
 
-        if ($result) {
-            return $result;
-        }
+        $attributesNames = array_map(fn(TokenRulePattern $trp) => $trp->tokenName, $attributes);
 
-        throw new \LogicException('Error no methods to fetch pattern', 1);
-    }
+        static::$lexerRules[static::class] = array_combine($attributesNames, $attributes);
 
-    private function getRuleIds(): \SplObjectStorage
-    {
-        $ruleStorage = new \SplObjectStorage();
-
-        $id = 0;
-        foreach ($this->patterns as $patternArr) {
-            $ruleStorage->attach($patternArr['tokenRule'], $patternArr['tokenRule']->id ?? $id);
-            ++$id;
-        }
-
-        return $ruleStorage;
+        return $attributes;
     }
 }
