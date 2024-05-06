@@ -32,36 +32,6 @@ class AbstractLexerTest extends TestCase
         return $reflMethod->getClosure($lexer);
     }
 
-    public function testGetTokenRuleFromMethods()
-    {
-        $lexer = $this->buildSampleLexer();
-        $method = $this->exposeHiddenMethod('getTokenRuleFromClass', $lexer);
-
-        $result = $method();
-        $this->assertIsArray($result);
-        $this->assertCount(6, $result);
-
-        $refinedResult = [];
-        foreach ($result as $key => $tokenRule) {
-            $this->assertNotNull($tokenRule, 'tokenRule must not be empty! (key: '.$key.')');
-            $this->assertInstanceOf(TokenRulePattern::class, $tokenRule);
-            $refinedResult[] = [
-                $tokenRule->tokenName,
-                $tokenRule->pattern,
-                $tokenRule->reserved,
-            ];
-        }
-
-        $this->assertSame([
-            ['varName', '/[a-z](\w|\d|\_)*/', false],
-            ['for', '/for/', true],
-            ['in', '/in/', true],
-            ['func', '/[A-Z][A-Za-z0-9_]*/', false],
-            ['num', '/\d+/', false],
-            ['__ignoreToken', '/\s+/', false],
-        ], $refinedResult);
-    }
-
     public function testFactoryIteratorsFromInput()
     {
         $lexer = $this->buildSampleLexer(['for i2a in Range 10']);

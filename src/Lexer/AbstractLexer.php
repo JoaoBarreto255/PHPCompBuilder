@@ -7,6 +7,7 @@ namespace JB255\PHPCompBuilder\Lexer;
 use JB255\PHPCompBuilder\Lexer\Pattern\TokenRuleIterator;
 use JB255\PHPCompBuilder\Lexer\Pattern\TokenRulePattern;
 use JB255\PHPCompBuilder\Lexer\Pattern\TokenState;
+use JB255\PHPCompBuilder\Lexer\Traits\GetTokenRulesFromClassTrait;
 
 /**
  * Classe abstrata que fornece uma estrutura básica para criar analisadores lexicais (lexers) em PHP.
@@ -73,6 +74,8 @@ use JB255\PHPCompBuilder\Lexer\Pattern\TokenState;
  */
 abstract class AbstractLexer implements \Iterator
 {
+    use GetTokenRulesFromClassTrait;
+
     private readonly array $patterns;
     private string $input = '';
     private string $val = '';
@@ -80,8 +83,6 @@ abstract class AbstractLexer implements \Iterator
     private int $lineno = 0;
     private int $col = 0;
     protected ?\Generator $tokenStream = null;
-
-    protected static array $lexerRules = [];
 
     /**
      * @var JB255\PHPCompBuilder\Lexer\Pattern\TokenRuleIterator[]
@@ -274,33 +275,5 @@ abstract class AbstractLexer implements \Iterator
     public function line(): string
     {
         return $this->input;
-    }
-
-    /**
-     * Build for lexer list of rules to apply to each line.
-     *
-     * @return \JB255\PHPCompBuilder\Lexer\Pattern\TokenRulePattern[] - methods with pattern to be processed
-     */
-    private function getTokenRuleFromClass(): array
-    {
-        if (isset(static::$lexerRules[static::class])) {
-            return static::$lexerRules[static::class];
-        }
-
-        $reflection = new \ReflectionClass($this);
-        if (empty($attributes = $reflection->getAttributes(TokenRulePattern::class))) {
-            throw new \LogicException("Missing token attributes on lexer");
-        }
-
-        $attributes = array_map(fn(\ReflectionAttribute $attr) => $attr->newInstance(), $attributes);
-        $attributes[] = new TokenRulePattern(
-            '__ignoreToken', $this->ignorePattern()
-        );
-
-        $attributesNames = array_map(fn(TokenRulePattern $trp) => $trp->tokenName, $attributes);
-
-        static::$lexerRules[static::class] = array_combine($attributesNames, $attributes);
-
-        return $attributes;
     }
 }
