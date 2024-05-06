@@ -189,9 +189,11 @@ abstract class AbstractLexer implements \Iterator
                 if ($tokenData = $this->peekRightToken()) {
                     $this->val = $tokenData->value;
 
-                    if ($result = $tokenData->tokenRule->executeCallback(
-                        $this->val, $this->pos, $this->lineno, $this->col
-                    )) {
+                    if ('__ignoreToken' !== $tokenData->tokenRule->tokenName 
+                        && $result = $tokenData->tokenRule->createToken(
+                            $this->val, $this->pos, $this->lineno, $this->col
+                        )
+                    ) {
                         yield $result;
                     }
 
@@ -292,7 +294,7 @@ abstract class AbstractLexer implements \Iterator
 
         $attributes = array_map(fn(\ReflectionAttribute $attr) => $attr->newInstance(), $attributes);
         $attributes[] = new TokenRulePattern(
-            '__ignoreToken', $this->ignorePattern(), fn(string $ignore) => null
+            '__ignoreToken', $this->ignorePattern()
         );
 
         $attributesNames = array_map(fn(TokenRulePattern $trp) => $trp->tokenName, $attributes);

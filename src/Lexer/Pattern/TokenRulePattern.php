@@ -10,12 +10,11 @@ use JB255\PHPCompBuilder\Lexer\Pattern\Exception\InvalidParameterTypeException;
 readonly class TokenRulePattern
 {
     public string $pattern;
-    protected \Closure $callback;
 
     public function __construct(
         public string $tokenName,
         string $pattern,
-        ?\Closure $callback = null,
+        public string $container = 'array',
         public bool $reserved = false,
         public bool $caseInsensitive = false,
     ) {
@@ -36,26 +35,32 @@ readonly class TokenRulePattern
         }
 
         $this->pattern = $pattern;
-        if (null === $callback) {
-            $callback = fn($v) => null;
-        }
-
-        $this->validateParameters($callback);
-        $this->callback = $callback;
+        $this->validateParameters($container);
     }
 
-    protected function validateParameters(\Closure $closure): void
+    protected function validateParameters(string $container): void
     {
-        $reflFunc = new \ReflectionFunction($closure);
-        if (0 === $reflFunc->getNumberOfParameters()) {
-            throw new \LogicException('You shall not pass with zero parameters!');
+        if ('array' === $container || \stdClass::class === $container) {
+            return;
+        }
+        if (!class_exists($container)) {
+            throw new \LogicException("Token Container isn't a valid class: $container");
         }
 
-        if (4 < $reflFunc->getNumberOfRequiredParameters()) {
-            throw new \LogicException('Too many required arguments in closure!');
+        $reflection = new \ReflectionClass($container);
+        $constructor = $reflection->getConstructor();
+        if ($constructor->isPrivate() || $constructor->isProtected()) {
+            throw new \LogicException("Can't create an object with constructor not public. ($container)");
+        }
+        if (0 === $constructor->getNumberOfParameters()) {
+            throw new \LogicException(sprintf('Container "%s" must have at least one parameter!', $container));
         }
 
-        foreach ($reflFunc->getParameters() as $param) {
+        if (4 < $constructor->getNumberOfRequiredParameters()) {
+            throw new \LogicException('Too many parameters required for token instantiation!');
+        }
+
+        foreach ($constructor->getParameters() as $param) {
             if (4 < ($position = $param->getPosition())) {
                 continue;
             }
@@ -108,17 +113,41 @@ readonly class TokenRulePattern
         );
     }
 
-    public function executeCallback(
+    public function createToken(
         string $value, int $positon, int $lineno, int $column
     ) {
-        $callback = $this->callback;
-        $totalOfArguments = (new \ReflectionFunction($this->callback))->getNumberOfRequiredParameters();
+        if (\in_array($this->container, [
+            'array',
+            \stdClass::class,
+            \ArrayObject::class,
+            \ArrayIterator::class,
+        ], true)) {
+
+            $data = [
+                'value' => $value,
+                'pos' => $positon,
+                'lineno' => $lineno,
+                'col' => $column,
+            ];
+
+            return match ($this->container) {
+                'array' => $data,
+                \stdClass::class => (object) $data,
+                \ArrayObject::class => new \ArrayObject($data),
+                \ArrayIterator::class => new \ArrayIterator($data),
+            };
+        }
+
+        $classname = $this->container;
+        $totalOfArguments = (new \ReflectionClass($classname))
+            ->getConstructor()
+            ->getNumberOfRequiredParameters();
 
         return match ($totalOfArguments) {
-            1 => $callback($value),
-            2 => $callback($value, $positon),
-            3 => $callback($value, $positon, $lineno),
-            4 => $callback($value, $positon, $lineno, $column),
+            1 => new $classname($value),
+            2 => new $classname($value, $positon),
+            3 => new $classname($value, $positon, $lineno),
+            4 => new $classname($value, $positon, $lineno, $column),
         };
     }
 }
