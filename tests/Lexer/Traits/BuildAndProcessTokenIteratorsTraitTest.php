@@ -6,14 +6,14 @@ namespace JB255\PHPCompBuilder\Tests\Lexer\Traits;
 
 use JB255\PHPCompBuilder\Lexer\Pattern\TokenRuleIterator;
 use JB255\PHPCompBuilder\Lexer\Pattern\TokenRulePattern;
-use JB255\PHPCompBuilder\Lexer\Traits\FactoryIteratorsFromLineTrait;
+use JB255\PHPCompBuilder\Lexer\Traits\BuildAndProcessTokenIteratorsTrait;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
-#[CoversClass(FactoryIteratorsFromLineTrait::class)]
-class FactoryIteratorsFromLineTraitTest extends TestCase
+#[CoversClass(BuildAndProcessTokenIteratorsTrait::class)]
+class BuildAndProcessTokenIteratorsTraitTest extends TestCase
 {
-    use FactoryIteratorsFromLineTrait;
+    use BuildAndProcessTokenIteratorsTrait;
     protected array $patterns = [];
 
     public function setUp(): void

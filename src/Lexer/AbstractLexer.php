@@ -4,8 +4,7 @@ declare(strict_types=1);
 
 namespace JB255\PHPCompBuilder\Lexer;
 
-use JB255\PHPCompBuilder\Lexer\Pattern\TokenState;
-use JB255\PHPCompBuilder\Lexer\Traits\FactoryIteratorsFromLineTrait;
+use JB255\PHPCompBuilder\Lexer\Traits\BuildAndProcessTokenIteratorsTrait;
 use JB255\PHPCompBuilder\Lexer\Traits\LoadTokenRulePatternsTrait;
 
 /**
@@ -74,7 +73,7 @@ use JB255\PHPCompBuilder\Lexer\Traits\LoadTokenRulePatternsTrait;
 abstract class AbstractLexer implements \Iterator
 {
     use LoadTokenRulePatternsTrait;
-    use FactoryIteratorsFromLineTrait;
+    use BuildAndProcessTokenIteratorsTrait;
 
     protected ?\Generator $tokenStream = null;
 
@@ -130,41 +129,6 @@ abstract class AbstractLexer implements \Iterator
     public function valid(): bool
     {
         return $this->tokenStream->valid();
-    }
-
-    private function peekRightToken(): ?TokenState
-    {
-        $result = null;
-        foreach ($this->iterators as $key => $iterator) {
-            // exlude any invalid tokens between another big one.
-            while ($iterator->valid() && $iterator->key() < $this->column()) {
-                $iterator->next();
-            }
-
-            if (!$iterator->valid()) {
-                unset($this->iterators[$key]);
-                continue;
-            }
-
-            // avoid process token not in current position.
-            if ($iterator->key() > $this->column()) {
-                continue;
-            }
-
-            $new = new TokenState($iterator->tokenRulePattern, $iterator->current());
-            $iterator->next();
-            if (!$result instanceof TokenState) {
-                $result = $new;
-                continue;
-            }
-    
-            $result = match ($new->compare($result)) {
-                1 => $new,
-                default => $result,
-            };
-        }
-
-        return $result;
     }
 
     private function buildTokenStream(): \Generator
