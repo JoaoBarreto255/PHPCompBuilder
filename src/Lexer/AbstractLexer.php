@@ -8,6 +8,7 @@ use JB255\PHPCompBuilder\Lexer\Pattern\TokenRuleIterator;
 use JB255\PHPCompBuilder\Lexer\Pattern\TokenRulePattern;
 use JB255\PHPCompBuilder\Lexer\Pattern\TokenState;
 use JB255\PHPCompBuilder\Lexer\Traits\GetTokenRulesFromClassTrait;
+use JB255\PHPCompBuilder\Lexer\Traits\LexerCurrentStateGettersTrait;
 
 /**
  * Classe abstrata que fornece uma estrutura básica para criar analisadores lexicais (lexers) em PHP.
@@ -75,13 +76,9 @@ use JB255\PHPCompBuilder\Lexer\Traits\GetTokenRulesFromClassTrait;
 abstract class AbstractLexer implements \Iterator
 {
     use GetTokenRulesFromClassTrait;
+    use LexerCurrentStateGettersTrait;
 
     private readonly array $patterns;
-    private string $input = '';
-    private string $val = '';
-    private int $pos = 0;
-    private int $lineno = 0;
-    private int $col = 0;
     protected ?\Generator $tokenStream = null;
 
     /**
@@ -148,7 +145,7 @@ abstract class AbstractLexer implements \Iterator
         $result = null;
         foreach ($this->iterators as $key => $iterator) {
             // exlude any invalid tokens between another big one.
-            while ($iterator->valid() && $iterator->key() < $this->col) {
+            while ($iterator->valid() && $iterator->key() < $this->column()) {
                 $iterator->next();
             }
 
@@ -158,7 +155,7 @@ abstract class AbstractLexer implements \Iterator
             }
 
             // avoid process token not in current position.
-            if ($iterator->key() > $this->col) {
+            if ($iterator->key() > $this->column()) {
                 continue;
             }
 
@@ -181,26 +178,27 @@ abstract class AbstractLexer implements \Iterator
     private function buildTokenStream(): \Generator
     {
         foreach ($this->streamIterator as $lineno => $line) {
-            $this->input = $line;
-            $this->lineno = $lineno;
+            $this->setLine($line)
+                ->setLineno($lineno);
             $this->iterators = $this->factoryIteratorsFromInput();
 
-            $this->col = 0;
+            $this->resetColumn();
             while (true) {
                 if ($tokenData = $this->peekRightToken()) {
-                    $this->val = $tokenData->value;
+                    $this->setValue($tokenData->value);
 
                     if ('__ignoreToken' !== $tokenData->tokenRule->tokenName 
                         && $result = $tokenData->tokenRule->createToken(
-                            $this->val, $this->pos, $this->lineno, $this->col
+                            $this->value(), $this->position(), $this->lineno(), $this->column()
                         )
                     ) {
                         yield $result;
                     }
 
-                    $this->val = '';
-                    $this->pos += $tokenData->len;
-                    $this->col += $tokenData->len;
+                    $this->setValue('')
+                        ->increasePosition($tokenData->len)
+                        ->increaseColumn($tokenData->len);
+
                     continue;
                 }
 
@@ -211,7 +209,7 @@ abstract class AbstractLexer implements \Iterator
                 $this->throwInvalidCharacterException();
             }
 
-            if (strlen($this->line()) < $this->col) {
+            if (strlen($this->line()) < $this->column()) {
                 $this->throwInvalidCharacterException();
             }
         }
@@ -219,7 +217,9 @@ abstract class AbstractLexer implements \Iterator
 
     protected function throwInvalidCharacterException(): void
     {
-        throw new InvalidCharacterException($this->filename, $this->input[$this->col], $this->pos, $this->lineno, $this->col);
+        throw new InvalidCharacterException(
+            $this->filename, $this->line()[$this->column()], $this->position(), $this->lineno(), $this->column()
+        );
     }
 
     /**
@@ -230,7 +230,7 @@ abstract class AbstractLexer implements \Iterator
     {
         return array_map(
             fn(TokenRulePattern $trp) => new TokenRuleIterator(
-                $this->input, $trp
+                $this->line(), $trp
             ), $this->patterns
         );
     }
@@ -238,42 +238,5 @@ abstract class AbstractLexer implements \Iterator
     protected function ignorePatternAction()
     {
         return null;
-    }
-
-    /**
-     * Returns current string processed.
-     */
-    public function value(): string
-    {
-        return $this->val;
-    }
-
-    /**
-     * Current token position in file.
-     */
-    public function position(): int
-    {
-        return $this->pos;
-    }
-
-    /**
-     * Position in line where current token is.
-     */
-    public function column(): int
-    {
-        return $this->col;
-    }
-
-    /**
-     * Number from current token.
-     */
-    public function lineNumber(): int
-    {
-        return $this->lineno;
-    }
-
-    public function line(): string
-    {
-        return $this->input;
     }
 }
