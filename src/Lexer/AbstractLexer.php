@@ -75,14 +75,13 @@ abstract class AbstractLexer implements \Iterator
     use LoadTokenRulePatternsTrait;
     use BuildAndProcessTokenIteratorsTrait;
 
-    protected ?\Generator $tokenStream = null;
-
     public function __construct(
-        readonly private \Iterator $streamIterator,
-        readonly public string $filename,
+        \Iterator $streamIterator,
+        string $filename,
         array $patterns = []
     ) {
         $this->initTokenPatterns($patterns);
+        $this->initTokenStream($streamIterator, $filename);
         $this->tokenStream = $this->buildTokenStream();
     }
 
@@ -129,52 +128,5 @@ abstract class AbstractLexer implements \Iterator
     public function valid(): bool
     {
         return $this->tokenStream->valid();
-    }
-
-    private function buildTokenStream(): \Generator
-    {
-        foreach ($this->streamIterator as $lineno => $line) {
-            $this->setLine($line)
-                ->setLineno($lineno)
-                ->factoryIteratorsFromLine()
-                ->resetColumn();
-
-            while (true) {
-                if ($tokenData = $this->peekRightToken()) {
-                    $this->setValue($tokenData->value);
-
-                    if ('__ignoreToken' !== $tokenData->tokenRule->tokenName 
-                        && $result = $tokenData->tokenRule->createToken(
-                            $this->value(), $this->position(), $this->lineno(), $this->column()
-                        )
-                    ) {
-                        yield $result;
-                    }
-
-                    $this->setValue('')
-                        ->increasePosition($tokenData->len)
-                        ->increaseColumn($tokenData->len);
-
-                    continue;
-                }
-
-                if (empty($iterators)) {
-                    break;
-                }
-
-                $this->throwInvalidCharacterException();
-            }
-
-            if (strlen($this->line()) < $this->column()) {
-                $this->throwInvalidCharacterException();
-            }
-        }
-    }
-
-    protected function throwInvalidCharacterException(): void
-    {
-        throw new InvalidCharacterException(
-            $this->filename, $this->line()[$this->column()], $this->position(), $this->lineno(), $this->column()
-        );
     }
 }
