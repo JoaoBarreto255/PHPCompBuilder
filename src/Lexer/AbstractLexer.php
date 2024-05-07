@@ -214,9 +214,4 @@ abstract class AbstractLexer implements \Iterator
             $this->filename, $this->line()[$this->column()], $this->position(), $this->lineno(), $this->column()
         );
     }
-
-    protected function ignorePatternAction()
-    {
-        return null;
-    }
 }
