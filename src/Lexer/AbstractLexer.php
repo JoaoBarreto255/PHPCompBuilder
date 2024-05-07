@@ -4,11 +4,9 @@ declare(strict_types=1);
 
 namespace JB255\PHPCompBuilder\Lexer;
 
-use JB255\PHPCompBuilder\Lexer\Pattern\TokenRuleIterator;
-use JB255\PHPCompBuilder\Lexer\Pattern\TokenRulePattern;
 use JB255\PHPCompBuilder\Lexer\Pattern\TokenState;
+use JB255\PHPCompBuilder\Lexer\Traits\FactoryIteratorsFromLineTrait;
 use JB255\PHPCompBuilder\Lexer\Traits\GetTokenRulesFromClassTrait;
-use JB255\PHPCompBuilder\Lexer\Traits\LexerCurrentStateGettersTrait;
 
 /**
  * Classe abstrata que fornece uma estrutura básica para criar analisadores lexicais (lexers) em PHP.
@@ -76,15 +74,10 @@ use JB255\PHPCompBuilder\Lexer\Traits\LexerCurrentStateGettersTrait;
 abstract class AbstractLexer implements \Iterator
 {
     use GetTokenRulesFromClassTrait;
-    use LexerCurrentStateGettersTrait;
+    use FactoryIteratorsFromLineTrait;
 
     private readonly array $patterns;
     protected ?\Generator $tokenStream = null;
-
-    /**
-     * @var JB255\PHPCompBuilder\Lexer\Pattern\TokenRuleIterator[]
-     */
-    private array $iterators = [];
 
     public function __construct(
         readonly private \Iterator $streamIterator,
@@ -179,10 +172,10 @@ abstract class AbstractLexer implements \Iterator
     {
         foreach ($this->streamIterator as $lineno => $line) {
             $this->setLine($line)
-                ->setLineno($lineno);
-            $this->iterators = $this->factoryIteratorsFromInput();
+                ->setLineno($lineno)
+                ->factoryIteratorsFromLine()
+                ->resetColumn();
 
-            $this->resetColumn();
             while (true) {
                 if ($tokenData = $this->peekRightToken()) {
                     $this->setValue($tokenData->value);
@@ -219,19 +212,6 @@ abstract class AbstractLexer implements \Iterator
     {
         throw new InvalidCharacterException(
             $this->filename, $this->line()[$this->column()], $this->position(), $this->lineno(), $this->column()
-        );
-    }
-
-    /**
-     * build for current line TokenRuleIterator.
-     * @return \JB255\PHPCompBuilder\Lexer\Pattern\TokenRuleIterator[]
-     */
-    private function factoryIteratorsFromInput(): array
-    {
-        return array_map(
-            fn(TokenRulePattern $trp) => new TokenRuleIterator(
-                $this->line(), $trp
-            ), $this->patterns
         );
     }
 

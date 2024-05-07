@@ -32,21 +32,6 @@ class AbstractLexerTest extends TestCase
         return $reflMethod->getClosure($lexer);
     }
 
-    public function testFactoryIteratorsFromInput()
-    {
-        $lexer = $this->buildSampleLexer(['for i2a in Range 10']);
-        $method = $this->exposeHiddenMethod('factoryIteratorsFromInput', $lexer);
-
-        $result = $method();
-
-        $this->assertIsArray($result);
-        $this->assertCount(6, $result);
-        foreach ($result as $key => $iterator) {
-            $msg = "fail at iterator row ({$key})";
-            $this->assertInstanceOf(TokenRuleIterator::class, $iterator, $msg);
-        }
-    }
-
     public function testBuildTokenStream()
     {
         $lexer = $this->buildSampleLexer([
