@@ -10,6 +10,7 @@ use JB255\PHPCompBuilder\Lexer\Pattern\TokenRulePattern;
 trait FactoryIteratorsFromLineTrait
 {
     use LexerCurrentStateGettersTrait;
+
     /**
      * @var JB255\PHPCompBuilder\Lexer\Pattern\TokenRuleIterator[]
      */

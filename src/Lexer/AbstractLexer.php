@@ -6,7 +6,7 @@ namespace JB255\PHPCompBuilder\Lexer;
 
 use JB255\PHPCompBuilder\Lexer\Pattern\TokenState;
 use JB255\PHPCompBuilder\Lexer\Traits\FactoryIteratorsFromLineTrait;
-use JB255\PHPCompBuilder\Lexer\Traits\GetTokenRulesFromClassTrait;
+use JB255\PHPCompBuilder\Lexer\Traits\LoadTokenRulePatternsTrait;
 
 /**
  * Classe abstrata que fornece uma estrutura básica para criar analisadores lexicais (lexers) em PHP.
@@ -73,7 +73,7 @@ use JB255\PHPCompBuilder\Lexer\Traits\GetTokenRulesFromClassTrait;
  */
 abstract class AbstractLexer implements \Iterator
 {
-    use GetTokenRulesFromClassTrait;
+    use LoadTokenRulePatternsTrait;
     use FactoryIteratorsFromLineTrait;
 
     protected ?\Generator $tokenStream = null;

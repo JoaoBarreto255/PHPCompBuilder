@@ -4,8 +4,7 @@ declare(strict_types=1);
 
 namespace JB255\PHPCompBuilder\Tests\Lexer\Traits;
 
-use JB255\PHPCompBuilder\Lexer\Traits\GetTokenRulesFromClassTrait;
-// use JB255\PHPCompBuilder\Lexer\Pattern\TokenRuleIterator;
+use JB255\PHPCompBuilder\Lexer\Traits\LoadTokenRulePatternsTrait;
 use JB255\PHPCompBuilder\Lexer\Pattern\TokenRulePattern;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
@@ -20,10 +19,10 @@ use PHPUnit\Framework\TestCase;
 #[TokenRulePattern('in','in', reserved:true)]
 #[TokenRulePattern('func','[A-Z][A-Za-z0-9_]*')]
 #[TokenRulePattern('num', '\d+')]
-#[CoversClass(GetTokenRulesFromClassTrait::class)]
-class GetTokenRulesFromClassTraitTest extends TestCase
+#[CoversClass(LoadTokenRulePatternsTrait::class)]
+class LoadTokenRulePatternsTraitTest extends TestCase
 {
-    use GetTokenRulesFromClassTrait;
+    use LoadTokenRulePatternsTrait;
 
     public function testGetTokenRuleFromClass()
     {

@@ -6,7 +6,7 @@ namespace JB255\PHPCompBuilder\Lexer\Traits;
 
 use JB255\PHPCompBuilder\Lexer\Pattern\TokenRulePattern;
 
-trait GetTokenRulesFromClassTrait
+trait LoadTokenRulePatternsTrait
 {
     private array $patterns = [];
     private static array $lexerRules = [];

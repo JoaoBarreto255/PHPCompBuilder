@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace JB255\PHPCompBuilder\Tests\Lexer;
 
 use JB255\PHPCompBuilder\Lexer\AbstractLexer;
-use JB255\PHPCompBuilder\Lexer\Pattern\TokenRuleIterator;
-use JB255\PHPCompBuilder\Lexer\Pattern\TokenRulePattern;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
