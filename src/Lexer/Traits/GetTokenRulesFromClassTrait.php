@@ -8,14 +8,22 @@ use JB255\PHPCompBuilder\Lexer\Pattern\TokenRulePattern;
 
 trait GetTokenRulesFromClassTrait
 {
+    private array $patterns = [];
     private static array $lexerRules = [];
+
+    protected function initTokenPatterns(array $foreignPatterns = []): self
+    {
+        $this->patterns = $foreignPatterns ?: $this->getTokenRuleFromClass();
+
+        return $this;
+    }
 
     /**
      * Build for lexer list of rules to apply to each line.
      *
      * @return \JB255\PHPCompBuilder\Lexer\Pattern\TokenRulePattern[] - methods with pattern to be processed
      */
-    public function getTokenRuleFromClass(): array
+    protected function getTokenRuleFromClass(): array
     {
         if (count(static::$lexerRules)) {
             return static::$lexerRules;

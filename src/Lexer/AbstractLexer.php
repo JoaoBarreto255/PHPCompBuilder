@@ -76,7 +76,6 @@ abstract class AbstractLexer implements \Iterator
     use GetTokenRulesFromClassTrait;
     use FactoryIteratorsFromLineTrait;
 
-    private readonly array $patterns;
     protected ?\Generator $tokenStream = null;
 
     public function __construct(
@@ -84,7 +83,7 @@ abstract class AbstractLexer implements \Iterator
         readonly public string $filename,
         array $patterns = []
     ) {
-        $this->patterns = $patterns ?: $this->getTokenRuleFromClass();
+        $this->initTokenPatterns($patterns);
         $this->tokenStream = $this->buildTokenStream();
     }
 
