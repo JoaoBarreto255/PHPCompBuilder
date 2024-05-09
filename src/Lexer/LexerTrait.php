@@ -26,19 +26,15 @@ use JB255\PHPCompBuilder\Lexer\Traits\LoadTokenRulePatternsTrait;
  * ## Exemplo:
  *
  * ```php
- * class SimpleLexer extends AbstractLexer {
+ * #[TokenRulePattern('identifier', '^[a-zA-Z_]+', MyTokenContainer::class)]
+ * // ... outros attributos.
+ * class SimpleLexer {
+ *     use JB255\PHPCompBuilder\Lexer\LexerTrait;
+ *
  *     public function ignorePattern(): string {
  *         // Ignorar espaços em branco e comentários
  *         return '\s+|#.*';
  *     }
- *
- *     #[TokenRulePattern('^[a-zA-Z_]+')]
- *     protected function processIdentifier(): Token {
- *         // Processar identificadores
- *         return new Token(Token::IDENTIFIER, $this->value());
- *     }
- *
- *     // ... outros métodos de processamento de tokens
  * }
  *
  * $lexer = new SimpleLexer(new \ArrayIterator(file('my_code.php')));
@@ -47,45 +43,28 @@ use JB255\PHPCompBuilder\Lexer\Traits\LoadTokenRulePatternsTrait;
  *     echo $token->getType() . ': ' . $token->getValue() . PHP_EOL;
  * }
  * ```
- *
- * ## Propriedades e Métodos Importantes:
- *
- * - **tokenStream:** Propriedade que contém o gerador de tokens (stream de tokens).
- * - **ignorePattern():** Método abstrato para definir a expressão regular de caracteres a serem ignorados.
- * - **buildTokenStream():** Método interno que constrói o gerador de tokens.
- * - **getTokenRuleFromMethods():** Método interno que obtém as regras de tokens a partir dos métodos da classe.
- * - **factoryIteratorsFromInput():** Método interno que cria iteradores para as regras de tokens aplicadas a uma linha de código.
- * - **throwInvalidCharacterException():** Método interno que lança uma exceção ao encontrar caracteres inválidos.
- *
- * ## Outros Métodos:
- *
- * - **current():** Retorna o token atual.
- * - **next():** Move o cursor para o próximo token.
- * - **key():** Retorna a chave do token atual (número de tokens processados).
- * - **rewind():** Redefine o lexer para o primeiro token.
- * - **valid():** Verifica se o fluxo de tokens terminou.
- * - **value():** Retorna a string atual processada.
- * - **position():** Retorna a posição do token atual no arquivo.
- * - **column():** Retorna a posição do token atual na linha.
- * - **lineNumber():** Retorna o número da linha do token atual.
- * - **line():** Retorna a linha atual sendo processada.
  */
-abstract class AbstractLexer implements \Iterator
+trait LexerTrait
 {
     use LoadTokenRulePatternsTrait;
     use BuildAndProcessTokenIteratorsTrait;
 
-    public function __construct(
-        \Iterator $streamIterator,
-        string $filename,
-        array $patterns = []
+    /**
+     * Must be added in __constructor.
+     * 
+     * @param $patterns used to inject other patterns.
+     */
+    public function initLexer(
+        \Iterator $streamIterator, string $filename, array $patterns = [],
     ) {
         $this->initTokenPatterns($patterns);
         $this->initTokenStream($streamIterator, $filename);
         $this->tokenStream = $this->buildTokenStream();
     }
 
-    /** return regex from caracteres to be ignored */
+    /** 
+     * @return string regex from caracteres to be ignored 
+     */
     abstract public function ignorePattern(): string;
 
     /**
