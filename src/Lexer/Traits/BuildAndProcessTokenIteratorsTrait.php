@@ -98,7 +98,7 @@ trait BuildAndProcessTokenIteratorsTrait
                     $this->setValue($tokenData->value);
 
                     if ('__ignoreToken' !== $tokenData->tokenRule->tokenName 
-                        && $result = $tokenData->tokenRule->createToken(
+                        && $result = $tokenData->getTokenFactory()(
                             $this->value(), $this->position(), $this->lineno(), $this->column()
                         )
                     ) {

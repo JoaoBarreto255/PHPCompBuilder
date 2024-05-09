@@ -38,4 +38,9 @@ readonly class TokenState
     {
         return $this->tokenRule->reserved;
     }
+
+    public function getTokenFactory(): TokenFactory
+    {
+        return $this->tokenRule->tokenFactory;
+    }
 }
