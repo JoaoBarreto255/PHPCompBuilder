@@ -4,42 +4,36 @@ declare(strict_types=1);
 
 namespace JB255\PHPCompBuilder\Tests\Lexer;
 
-use JB255\PHPCompBuilder\Lexer\AbstractLexer;
+use JB255\PHPCompBuilder\Lexer\LexerTrait;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
+use JB255\PHPCompBuilder\Lexer\Pattern\TokenRulePattern;
 
-/**
- * @internal
- *
- * @coversNothing
- */
-#[CoversClass(AbstractLexer::class)]
-class AbstractLexerTest extends TestCase
+
+#[TokenRulePattern('varName', '/[a-z](\w|\d|\_)*/')] 
+#[TokenRulePattern('for','for', reserved:true)]
+#[TokenRulePattern('in','in', reserved:true)]
+#[TokenRulePattern('func','[A-Z][A-Za-z0-9_]*')]
+#[TokenRulePattern('num', '\d+')]
+#[CoversClass(LexerTrait::class)]
+class LexerTraitTest extends TestCase
 {
-    protected function buildSampleLexer(array $iterator = []): AbstractLexer
-    {   
-        return new FakeLexer(new \ArrayIterator($iterator), 'test.php');
-    }
+    use LexerTrait;
 
-    protected function exposeHiddenMethod(string $methodName, AbstractLexer $lexer): \Closure
+    public function ignorePattern(): string
     {
-        $reflection = new \ReflectionClass($lexer);
-        $reflMethod = $reflection->getMethod($methodName);
-        $reflMethod->setAccessible(true);
-
-        return $reflMethod->getClosure($lexer);
+        return '/\s+/';
     }
 
     public function testBuildTokenStream()
     {
-        $lexer = $this->buildSampleLexer([
+        $this->initLexer(new \ArrayIterator([
             "abc for i23 inoske 234 in\n\r",
             "   \t\n",
             "   \t Foo For\n",
-        ]);
-        $method = $this->exposeHiddenMethod('buildTokenStream', $lexer);
-        $tokenStream = $method();
+        ]), 'test.php');
 
+        $tokenStream = $this->buildTokenStream();
         $this->assertTrue($tokenStream->valid());
         $token = $tokenStream->current();
         $this->assertIsArray($token);
