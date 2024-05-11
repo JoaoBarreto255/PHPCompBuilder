@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace JB255\PHPCompBuilder\Parser\Productions;
+namespace JB255\PHPCompBuilder\Parser\Attributes;
 
 use Attribute;
 
