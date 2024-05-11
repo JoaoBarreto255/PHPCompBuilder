@@ -7,6 +7,6 @@ namespace JB255\PHPCompBuilder\Parser\Attributes;
 use Attribute;
 
 #[Attribute(Attribute::TARGET_CLASS)]
-readonly class Nonterminal
+final readonly class Nonterminal
 {
 }
