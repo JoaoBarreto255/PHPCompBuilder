@@ -2,7 +2,6 @@
 
 namespace JB255\PHPCompBuilder\Parser\SchemaContainers;
 
-use JB255\PHPCompBuilder\Parser\Attributes\Nonterminal;
 use JB255\PHPCompBuilder\Parser\Attributes\Production;
 use JB255\PHPCompBuilder\Parser\SchemaContainers\Exceptions\InvalidSymbolParameterException;
 
