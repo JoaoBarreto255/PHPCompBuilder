@@ -6,5 +6,4 @@ namespace JB255\PHPCompBuilder\Parser\Contracts;
 
 interface TerminalInterface
 {
-
 }

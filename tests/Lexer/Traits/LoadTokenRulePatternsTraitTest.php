@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace JB255\PHPCompBuilder\Tests\Lexer\Traits;
 
-use JB255\PHPCompBuilder\Lexer\Traits\LoadTokenRulePatternsTrait;
 use JB255\PHPCompBuilder\Lexer\Pattern\TokenRulePattern;
+use JB255\PHPCompBuilder\Lexer\Traits\LoadTokenRulePatternsTrait;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
@@ -14,10 +14,10 @@ use PHPUnit\Framework\TestCase;
  *
  * @coversNothing
  */
-#[TokenRulePattern('varName', '/[a-z](\w|\d|\_)*/')] 
-#[TokenRulePattern('for','for', reserved:true)]
-#[TokenRulePattern('in','in', reserved:true)]
-#[TokenRulePattern('func','[A-Z][A-Za-z0-9_]*')]
+#[TokenRulePattern('varName', '/[a-z](\w|\d|\_)*/')]
+#[TokenRulePattern('for', 'for', reserved: true)]
+#[TokenRulePattern('in', 'in', reserved: true)]
+#[TokenRulePattern('func', '[A-Z][A-Za-z0-9_]*')]
 #[TokenRulePattern('num', '\d+')]
 #[CoversClass(LoadTokenRulePatternsTrait::class)]
 class LoadTokenRulePatternsTraitTest extends TestCase

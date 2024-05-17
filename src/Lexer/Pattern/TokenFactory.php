@@ -14,7 +14,8 @@ class TokenFactory
     protected readonly string $tokenName;
     protected readonly string $container;
 
-    public function __construct(TokenRulePattern $pattern) {
+    public function __construct(TokenRulePattern $pattern)
+    {
         $this->reserved = $pattern->reserved;
         $this->tokenName = $pattern->tokenName;
         $this->container = $pattern->container;
@@ -24,13 +25,13 @@ class TokenFactory
     protected function validateParameters(): void
     {
         if (!class_exists($this->container)) {
-            throw new \LogicException("Token Container isn't a valid class: $this->container");
+            throw new \LogicException("Token Container isn't a valid class: {$this->container}");
         }
 
         $reflection = new \ReflectionClass($this->container);
         $constructor = $reflection->getConstructor();
         if ($constructor->isPrivate() || $constructor->isProtected()) {
-            throw new \LogicException("Can't create an object with constructor not public. ($this->container)");
+            throw new \LogicException("Can't create an object with constructor not public. ({$this->container})");
         }
 
         foreach ($constructor->getParameters() as $param) {
@@ -71,7 +72,7 @@ class TokenFactory
             throw $this->buildInvalidParameterTypeException($param, $expected, implode('&', $subTypes));
         }
 
-        if ($type instanceof \ReflectionUnionType 
+        if ($type instanceof \ReflectionUnionType
             && 0 === count(array_filter($subTypes, fn ($t) => $t === $expected))
         ) {
             throw $this->buildInvalidParameterTypeException($param, $expected, implode('&', $subTypes));
@@ -103,16 +104,15 @@ class TokenFactory
     protected function createTokenBuilder(): callable
     {
         return match ($this->container) {
-            'value' => fn($value, $p, $l, $c) => 
-                $this->reserved ? $value : $this->tokenName,
-            'array' => fn($value, $position, $lineno, $column) => [
+            'value' => fn ($value, $p, $l, $c) => $this->reserved ? $value : $this->tokenName,
+            'array' => fn ($value, $position, $lineno, $column) => [
                 'token_name' => $this->tokenName,
                 'value' => $value,
                 'pos' => $position,
                 'lineno' => $lineno,
                 'col' => $column,
             ],
-            \stdClass::class => fn($value, $position, $lineno, $column) => (object) [
+            \stdClass::class => fn ($value, $position, $lineno, $column) => (object) [
                 'token_name' => $this->tokenName,
                 'value' => $value,
                 'pos' => $position,
@@ -128,14 +128,15 @@ class TokenFactory
         $this->validateParameters();
         $totalOfParams = (new \ReflectionClass($classname = $this->container))
             ->getConstructor()
-            ->getNumberOfParameters();
+            ->getNumberOfParameters()
+        ;
 
         return match ($totalOfParams) {
-            1 => fn($v, $p, $ln, $c) => new $classname($this->tokenName),
-            2 => fn($v, $p, $ln, $c) => new $classname($this->tokenName, $v),
-            3 => fn($v, $p, $ln, $c) => new $classname($this->tokenName, $v, $p),
-            4 => fn($v, $p, $ln, $c) => new $classname($this->tokenName, $v, $p, $ln),
-            5 => fn($v, $p, $ln, $c) => new $classname($this->tokenName, $v, $p, $ln, $c),
+            1 => fn ($v, $p, $ln, $c) => new $classname($this->tokenName),
+            2 => fn ($v, $p, $ln, $c) => new $classname($this->tokenName, $v),
+            3 => fn ($v, $p, $ln, $c) => new $classname($this->tokenName, $v, $p),
+            4 => fn ($v, $p, $ln, $c) => new $classname($this->tokenName, $v, $p, $ln),
+            5 => fn ($v, $p, $ln, $c) => new $classname($this->tokenName, $v, $p, $ln, $c),
             default => throw new \LogicException(sprintf('Invalid number of required arguments! (required: %d)', $totalOfParams)),
         };
     }

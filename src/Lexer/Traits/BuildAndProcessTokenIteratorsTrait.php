@@ -29,7 +29,7 @@ trait BuildAndProcessTokenIteratorsTrait
     protected function factoryIteratorsFromLine(): self
     {
         $this->iterators = array_map(
-            fn(TokenRulePattern $trp) => new TokenRuleIterator(
+            fn (TokenRulePattern $trp) => new TokenRuleIterator(
                 $this->line(), $trp
             ), $this->patterns
         );
@@ -84,20 +84,21 @@ trait BuildAndProcessTokenIteratorsTrait
     private function buildTokenStream(): \Generator
     {
         if (null === $this->filename || null === $this->streamIterator) {
-            throw new \LogicException("You must init tokenStream before!", 1); 
+            throw new \LogicException('You must init tokenStream before!', 1);
         }
 
         foreach ($this->streamIterator as $lineno => $line) {
             $this->setLine($line)
                 ->setLineno($lineno)
                 ->factoryIteratorsFromLine()
-                ->resetColumn();
+                ->resetColumn()
+            ;
 
             while (true) {
                 if ($tokenData = $this->peekRightToken()) {
                     $this->setValue($tokenData->value);
 
-                    if ('__ignoreToken' !== $tokenData->tokenRule->tokenName 
+                    if ('__ignoreToken' !== $tokenData->tokenRule->tokenName
                         && $result = $tokenData->getTokenFactory()(
                             $this->value(), $this->position(), $this->lineno(), $this->column()
                         )
@@ -107,7 +108,8 @@ trait BuildAndProcessTokenIteratorsTrait
 
                     $this->setValue('')
                         ->increasePosition($tokenData->len)
-                        ->increaseColumn($tokenData->len);
+                        ->increaseColumn($tokenData->len)
+                    ;
 
                     continue;
                 }
@@ -127,8 +129,6 @@ trait BuildAndProcessTokenIteratorsTrait
 
     protected function throwInvalidCharacterException(): void
     {
-        throw new InvalidCharacterException(
-            $this->filename, $this->line()[$this->column()], $this->position(), $this->lineno(), $this->column()
-        );
+        throw new InvalidCharacterException($this->filename, $this->line()[$this->column()], $this->position(), $this->lineno(), $this->column());
     }
 }

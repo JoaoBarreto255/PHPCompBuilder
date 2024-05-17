@@ -5,15 +5,19 @@ declare(strict_types=1);
 namespace JB255\PHPCompBuilder\Tests\Lexer;
 
 use JB255\PHPCompBuilder\Lexer\LexerTrait;
+use JB255\PHPCompBuilder\Lexer\Pattern\TokenRulePattern;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
-use JB255\PHPCompBuilder\Lexer\Pattern\TokenRulePattern;
 
-
-#[TokenRulePattern('varName', '/[a-z](\w|\d|\_)*/')] 
-#[TokenRulePattern('for','for', reserved:true)]
-#[TokenRulePattern('in','in', reserved:true)]
-#[TokenRulePattern('func','[A-Z][A-Za-z0-9_]*')]
+/**
+ * @internal
+ *
+ * @coversNothing
+ */
+#[TokenRulePattern('varName', '/[a-z](\w|\d|\_)*/')]
+#[TokenRulePattern('for', 'for', reserved: true)]
+#[TokenRulePattern('in', 'in', reserved: true)]
+#[TokenRulePattern('func', '[A-Z][A-Za-z0-9_]*')]
 #[TokenRulePattern('num', '\d+')]
 #[CoversClass(LexerTrait::class)]
 class LexerTraitTest extends TestCase

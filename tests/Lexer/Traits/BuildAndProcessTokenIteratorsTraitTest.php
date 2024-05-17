@@ -11,6 +11,11 @@ use JB255\PHPCompBuilder\Lexer\Traits\BuildAndProcessTokenIteratorsTrait;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * @internal
+ *
+ * @coversNothing
+ */
 #[CoversClass(BuildAndProcessTokenIteratorsTrait::class)]
 class BuildAndProcessTokenIteratorsTraitTest extends TestCase
 {
@@ -22,9 +27,9 @@ class BuildAndProcessTokenIteratorsTraitTest extends TestCase
         parent::setUp();
         $this->patterns = [
             new TokenRulePattern('varName', '/[a-z](\w|\d|\_)*/'),
-            new TokenRulePattern('for','for', reserved:true),
-            new TokenRulePattern('in','in', reserved:true),
-            new TokenRulePattern('func','[A-Z][A-Za-z0-9_]*'),
+            new TokenRulePattern('for', 'for', reserved: true),
+            new TokenRulePattern('in', 'in', reserved: true),
+            new TokenRulePattern('func', '[A-Z][A-Za-z0-9_]*'),
             new TokenRulePattern('num', '\d+'),
             new TokenRulePattern('__ignoreToken', '/\s+/'),
         ];

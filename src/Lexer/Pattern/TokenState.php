@@ -22,14 +22,16 @@ readonly class TokenState
      * case current is as big as other and is reserved: 1.
      * case current is as big as other and isn't reserved and other is: -1.
      * Else is always 0.
-     * @return int between -1 and 1.
+     *
+     * @return int between -1 and 1
      */
     public function compare(self $other): int
     {
         $diff = $this->len - $other->len;
+
         return match ([$diff, $this->isReserved()]) {
             [0, true] => 1,
-            [0, false] => - (int) $other->isReserved(),
+            [0, false] => -(int) $other->isReserved(),
             default => $diff / abs($diff),
         };
     }

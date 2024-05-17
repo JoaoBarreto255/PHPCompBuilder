@@ -29,6 +29,7 @@ class TokenStateTest extends TestCase
     public static function dataProvider(): array
     {
         $rule = new TokenRulePattern('foo', '/\w+/');
+
         return [
             [new TokenState($rule, 'ba'), 2],
             [new TokenState($rule, 'bar'), 3],

@@ -39,27 +39,27 @@ class TokenRuleIteratorTest extends TestCase
     public static function dataProvider(): array
     {
         return [
-            [new TokenRulePattern('a','foo'), 'foobarbaz', [[0, 'foo']]],
-            [new TokenRulePattern('a','foo'), 'barfoobaz', [[3, 'foo']]],
-            [new TokenRulePattern('a','foo'), 'barbazfoo', [[6, 'foo']]],
-            [new TokenRulePattern('a','zig'), 'barbazfoo', []],
-            [new TokenRulePattern('a','zig'), 'zigzaggzigzag', [
+            [new TokenRulePattern('a', 'foo'), 'foobarbaz', [[0, 'foo']]],
+            [new TokenRulePattern('a', 'foo'), 'barfoobaz', [[3, 'foo']]],
+            [new TokenRulePattern('a', 'foo'), 'barbazfoo', [[6, 'foo']]],
+            [new TokenRulePattern('a', 'zig'), 'barbazfoo', []],
+            [new TokenRulePattern('a', 'zig'), 'zigzaggzigzag', [
                 [0, 'zig'],
                 [7, 'zig'],
             ]],
-            [new TokenRulePattern('a','/z.g/'), 'zigzaggzigzag', [
-                [0, 'zig'],
-                [3, 'zag'],
-                [7, 'zig'],
-                [10, 'zag'],
-            ]],
-            [new TokenRulePattern('a','/z.g/i'), 'zigzaggzigzag', [
+            [new TokenRulePattern('a', '/z.g/'), 'zigzaggzigzag', [
                 [0, 'zig'],
                 [3, 'zag'],
                 [7, 'zig'],
                 [10, 'zag'],
             ]],
-            [new TokenRulePattern('a','/(?<name>(bar)(biz)(boo))/'), 'barbizboooobzibrabbarbizboo', [
+            [new TokenRulePattern('a', '/z.g/i'), 'zigzaggzigzag', [
+                [0, 'zig'],
+                [3, 'zag'],
+                [7, 'zig'],
+                [10, 'zag'],
+            ]],
+            [new TokenRulePattern('a', '/(?<name>(bar)(biz)(boo))/'), 'barbizboooobzibrabbarbizboo', [
                 [0, 'barbizboo'],
                 [18, 'barbizboo'],
             ]],

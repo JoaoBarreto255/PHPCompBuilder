@@ -31,7 +31,7 @@ trait LoadTokenRulePatternsTrait
 
         $reflection = new \ReflectionClass($this);
         if (empty($attributes = $reflection->getAttributes(TokenRulePattern::class))) {
-            throw new \LogicException("Missing token attributes on lexer");
+            throw new \LogicException('Missing token attributes on lexer');
         }
 
         if (!method_exists($this, 'ignorePattern')) {
@@ -39,13 +39,13 @@ trait LoadTokenRulePatternsTrait
         }
 
         if ($this->ignorePattern()) {
-            $attributes = array_map(fn(\ReflectionAttribute $attr) => $attr->newInstance(), $attributes);
+            $attributes = array_map(fn (\ReflectionAttribute $attr) => $attr->newInstance(), $attributes);
             $attributes[] = new TokenRulePattern(
                 '__ignoreToken', $this->ignorePattern()
             );
         }
 
-        $attributesNames = array_map(fn(TokenRulePattern $trp) => $trp->tokenName, $attributes);
+        $attributesNames = array_map(fn (TokenRulePattern $trp) => $trp->tokenName, $attributes);
 
         static::$lexerRules = array_combine($attributesNames, $attributes);
 

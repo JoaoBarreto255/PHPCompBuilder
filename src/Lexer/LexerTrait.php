@@ -47,9 +47,9 @@ trait LexerTrait
      * It takes an iterator for the stream to be lexed, the filename of the stream,
      * and an optional array of additional token patterns.
      *
-     * @param \Iterator $streamIterator The iterator for the stream to be lexed.
-     * @param string $filename The filename of the stream.
-     * @param array $patterns An optional array of additional token patterns.
+     * @param \Iterator $streamIterator the iterator for the stream to be lexed
+     * @param string    $filename       the filename of the stream
+     * @param array     $patterns       an optional array of additional token patterns
      */
     public function initLexer(
         \Iterator $streamIterator, string $filename, array $patterns = []
@@ -65,8 +65,7 @@ trait LexerTrait
      * This method must be implemented by the descendant class and should return a regular expression
      * that matches the characters to be ignored.
      *
-     * @return string The regular expression for characters to be ignored.
-     * @abstract
+     * @return string the regular expression for characters to be ignored
      */
     abstract public function ignorePattern(): string;
 
@@ -76,7 +75,7 @@ trait LexerTrait
      * This method returns the current token from the token stream. The returned value can be either
      * a TokenInterface object or an integer representing the type of the token.
      *
-     * @return TokenInterface|string|array|\stdClass The current token from the token stream.
+     * @return TokenInterface|string|array|\stdClass the current token from the token stream
      */
     public function current(): mixed
     {
@@ -99,7 +98,7 @@ trait LexerTrait
      * This method returns the current key of the token stream, which represents the number of tokens
      * processed so far.
      *
-     * @return int The current key of the token stream.
+     * @return int the current key of the token stream
      */
     public function key(): mixed
     {
@@ -121,7 +120,7 @@ trait LexerTrait
      *
      * This method returns true if the end of the token stream has been reached, false otherwise.
      *
-     * @return bool True if the end of the token stream has been reached, false otherwise.
+     * @return bool true if the end of the token stream has been reached, false otherwise
      */
     public function valid(): bool
     {
