@@ -27,7 +27,7 @@ readonly class NonterminalSchema
 
         $reflection = new \ReflectionClass($name);
         if (!$reflection->implementsInterface(NonTerminalInterface::class)
-            && 0 < count($reflection->getAttributes(Nonterminal::class))
+            && 0 === count($reflection->getAttributes(Nonterminal::class))
         ) {
             throw new \InvalidArgumentException(sprintf('NonTerminal Symbol "%s" type class must implements "%s" or have attribute "%s""', $name, NonTerminalInterface::class, Nonterminal::class));
         }
