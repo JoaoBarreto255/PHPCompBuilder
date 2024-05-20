@@ -26,7 +26,7 @@ readonly class TerminalSchema
 
         $reflection = match ([class_exists($name), enum_exists($name)]) {
             [true, false] => new \ReflectionClass($name),
-            [true, false] => new \ReflectionEnum($name),
+            [false, true] => new \ReflectionEnum($name),
             default => null,
         };
 
