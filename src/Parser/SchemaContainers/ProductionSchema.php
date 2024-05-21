@@ -46,7 +46,11 @@ readonly class ProductionSchema
                 $symbols[] = $this->processMultiTypesFields($param);
             }
 
-            $symbols[] = new NonterminalSchema($type->getName());
+            try {
+                $symbols[] = new NonterminalSchema($type->getName());
+            } catch (\LogicException $e) {
+                throw $this->buildInvalidSymbolException($param);
+            }
         }
 
         $this->symbols = $symbols;
