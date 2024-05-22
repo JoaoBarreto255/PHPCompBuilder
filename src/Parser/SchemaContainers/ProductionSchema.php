@@ -31,12 +31,17 @@ readonly class ProductionSchema
             $type = $param->getType();
 
             // is terminal symbol.
-            if (!$param->hasType() || $type->isBuiltin() && 'string' === $type->getName()) {
+            if (!$param->hasType()) {
                 $symbols[] = new TerminalSchema($param->getName());
                 continue;
             }
 
-            if ($type->isBuiltin()) {
+            if ($type instanceof \ReflectionNamedType && 'string' === $type->getName()) {
+                $symbols[] = new TerminalSchema($param->getName());
+                continue;
+            }
+
+            if ($type instanceof \ReflectionNamedType && $type->isBuiltin()) {
                 throw $this->buildInvalidSymbolException($param);
             }
 
@@ -44,6 +49,7 @@ readonly class ProductionSchema
                 || $type instanceof \ReflectionIntersectionType
             ) {
                 $symbols[] = $this->processMultiTypesFields($param);
+                continue;
             }
 
             try {
@@ -70,9 +76,11 @@ readonly class ProductionSchema
         foreach ($notBuiltin as $subtype) {
             try {
                 return new NonterminalSchema($subtype);
-            } catch (\InvalidArgumentException $e) {
-                continue;
-            }
+            } catch (\InvalidArgumentException $e) { }
+
+            try {
+                return new TerminalSchema($subtype, true);
+            } catch(\InvalidArgumentException $e) { }
         }
 
         if ($hasStringType) {
