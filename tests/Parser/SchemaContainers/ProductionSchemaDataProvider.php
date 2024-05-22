@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace JB255\PHPCompBuilder\Tests\Parser\SchemaContainers;
 
-use JB255\PHPCompBuilder\Parser\Attributes\Nonterminal;
 use JB255\PHPCompBuilder\Parser\Attributes\Production;
 use JB255\PHPCompBuilder\Parser\Attributes\Terminal;
 use JB255\PHPCompBuilder\Parser\Contracts\NonTerminalInterface;
 use JB255\PHPCompBuilder\Parser\SchemaContainers\Exceptions\InvalidSymbolParameterException;
 use JB255\PHPCompBuilder\Parser\SchemaContainers\NonterminalSchema;
 use JB255\PHPCompBuilder\Parser\SchemaContainers\ProductionSchema;
+use JB255\PHPCompBuilder\Parser\SchemaContainers\TerminalSchema;
 
 class ProductionSchemaDataProvider
 {
@@ -59,6 +59,27 @@ class ProductionSchemaDataProvider
         return [
             [$productionSchema, current($method1->getParameters()), InvalidSymbolParameterException::class],
             [$productionSchema, current($method2->getParameters()), InvalidSymbolParameterException::class],
+        ];
+    }
+
+    public static function createDataProvider(): array
+    {
+        $header = new class() implements NonTerminalInterface {
+            public function ruleFoo($foo, NonterminalUsingAttributeSample $bar) {}
+            public function ruleBar($foo, NonterminalUsingAttributeSample|\ArrayObject $bar) {}
+            public function ruleBaz(string $foo, NonterminalUsingAttributeSample|\ArrayObject $bar) {}
+            public function ruleBuzz(
+                string $foo, NonterminalUsingAttributeSample|\ArrayObject $bar,
+                TerminalUsingAttributeSample&\ArrayAccess $buzz
+            ) { }
+        };
+        $header = new NonterminalSchema($header::class);
+
+        return [
+            [$header, 'ruleFoo', TerminalSchema::class, NonterminalSchema::class],
+            [$header, 'ruleBar', TerminalSchema::class, NonterminalSchema::class],
+            [$header, 'ruleBaz', TerminalSchema::class, NonterminalSchema::class],
+            [$header, 'ruleBuzz', TerminalSchema::class, NonterminalSchema::class, TerminalSchema::class],
         ];
     }
 }

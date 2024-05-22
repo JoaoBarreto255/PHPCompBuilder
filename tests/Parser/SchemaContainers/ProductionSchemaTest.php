@@ -34,4 +34,15 @@ class ProductionSchemaTest extends TestCase
         $reflection->setAccessible(true);
         $reflection->invoke($schema, $param);
     }
+
+    #[DataProviderExternal(ProductionSchemaDataProvider::class, 'createDataProvider')]
+    public function testCreate(NonterminalSchema $header, string $method, string ...$expected)
+    {
+        $schema = new ProductionSchema($header, $method);
+        $this->assertCount(count($expected), $schema->symbols);
+        $result = array_map(fn($s, $e) => [$s::class, $e], $schema->symbols, $expected);
+        foreach ($result as [$symbolClass, $classname]) {
+            $this->assertSame($classname, $symbolClass);
+        }
+    }
 }
